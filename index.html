@@ -19,7 +19,6 @@
     html {
       scroll-behavior: smooth;
     }
-    /* Hide scrollbars cleanly for horizontal swipeable tabs */
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
@@ -27,13 +26,11 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-    /* Prevent iOS Safari automatic viewport zooming on form input focus */
     @media screen and (max-width: 768px) {
       input, select, textarea {
         font-size: 16px !important;
       }
     }
-    /* Safe-area insets for modern edge-to-edge smartphones */
     .pb-safe {
       padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
     }
@@ -93,7 +90,7 @@
           <!-- Auth Profile Badge / Login Button Container -->
           <div id="auth-container" class="flex items-center"></div>
 
-          <!-- Desktop & Mobile Top Cart Icon Button -->
+          <!-- Top Cart Icon Button -->
           <button onclick="toggleCartDrawer()" aria-label="View Shopping Cart" class="relative p-2 rounded-full hover:bg-gray-100 active:scale-95 transition text-gray-700 cursor-pointer">
             <i class="fa-solid fa-cart-shopping text-lg sm:text-xl"></i>
             <span id="cart-badge" class="absolute -top-1 -right-1 bg-emerald-600 text-white text-[11px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center shadow-xs">0</span>
@@ -101,7 +98,7 @@
         </div>
       </div>
 
-      <!-- Mobile Search Bar Row (visible on small mobile screens below logo) -->
+      <!-- Mobile Search Bar Row -->
       <div class="sm:hidden mt-2 pt-1 border-t border-gray-100">
         <div class="relative w-full">
           <input 
@@ -127,7 +124,7 @@
     </div>
   </header>
 
-  <!-- Floating Mobile Cart Bar (Sticky right above bottom nav when cart has items) -->
+  <!-- Floating Mobile Cart Bar -->
   <div id="mobile-floating-cart-bar" class="md:hidden fixed bottom-[62px] left-3 right-3 z-30 hidden bg-gradient-to-r from-emerald-700 to-teal-800 text-white rounded-2xl shadow-xl p-3 flex justify-between items-center cursor-pointer active:scale-98 transition-all duration-300" onclick="toggleCartDrawer()">
     <div class="flex items-center gap-2.5">
       <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-sm font-bold shadow-inner">
@@ -144,7 +141,7 @@
     </div>
   </div>
 
-  <!-- Mobile Bottom App Bar (Sticky Bottom Nav) -->
+  <!-- Mobile Bottom App Bar -->
   <nav id="mobile-bottom-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 z-40 px-3 py-1.5 pb-safe flex justify-around items-center shadow-lg">
     <button onclick="navigate('home')" id="mob-nav-home" class="mob-nav-btn flex flex-col items-center justify-center flex-1 py-1 text-emerald-600 active:scale-95 transition">
       <i class="fa-solid fa-house text-lg"></i>
@@ -167,7 +164,7 @@
     </button>
   </nav>
 
-  <!-- Pages Container (with extra mobile bottom margin for bottom nav bar and floating cart) -->
+  <!-- Main Pages Container -->
   <main class="flex-grow max-w-7xl mx-auto px-3 sm:px-4 py-4 w-full mb-24 md:mb-0">
     
     <!-- 1. HOME PAGE -->
@@ -194,13 +191,12 @@
             </button>
           </div>
         </div>
-        <!-- Decorative Ambient Background Icon -->
         <div class="absolute -bottom-8 -right-8 text-white/10 text-9xl pointer-events-none sm:text-[14rem]">
           <i class="fa-solid fa-pepper-hot"></i>
         </div>
       </div>
 
-      <!-- Featured Categories Section -->
+      <!-- Featured Categories -->
       <div>
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
@@ -239,7 +235,7 @@
         <span>No local match found. Searching online catalog via Google Apps Script...</span>
       </div>
 
-      <!-- Sticky / Horizontal Swipeable Category Filter Bar -->
+      <!-- Sticky Category Filter Bar -->
       <div id="category-tabs-container" class="sticky top-[105px] sm:top-[65px] bg-gray-50/95 backdrop-blur-sm z-20 py-2 mb-3 -mx-3 px-3 sm:mx-0 sm:px-0">
         <div class="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth" id="category-tabs">
           <button onclick="filterCategory('All')" class="cat-pill whitespace-nowrap px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-emerald-600 text-white shadow-xs transition active:scale-95 flex-shrink-0">
@@ -248,7 +244,7 @@
         </div>
       </div>
 
-      <!-- Responsive Product Grid (2 columns on mobile, 3 on tablet, 4 on desktop) -->
+      <!-- Responsive Product Grid -->
       <div id="products-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5"></div>
       
       <!-- Empty State Notice -->
@@ -297,14 +293,14 @@
         <h2 class="text-xl sm:text-2xl font-black text-gray-900">Checkout & Delivery</h2>
       </div>
       
-      <!-- Unauthenticated Notice -->
+      <!-- Unauthenticated Notice & Centered Sign-In Button -->
       <div id="checkout-auth-warning" class="hidden bg-amber-50 border border-amber-200 p-5 sm:p-6 rounded-2xl text-center mb-6">
         <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
           <i class="fa-solid fa-triangle-exclamation"></i>
         </div>
         <h3 class="text-base sm:text-lg font-bold text-gray-800">Google Sign-In Required</h3>
         <p class="text-gray-600 text-xs sm:text-sm mt-1 mb-4">Please sign in with your Google account to confirm your identity and place your order.</p>
-        <div id="checkout-g-btn-wrapper" class="flex justify-center"></div>
+        <div id="checkout-g-btn-wrapper" class="flex justify-center min-h-[44px]"></div>
       </div>
 
       <!-- Checkout Form Layout -->
@@ -357,7 +353,6 @@
               <input type="text" id="cust-street-input" autocomplete="street-address" required class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition" placeholder="123 Market Street, Apt 4B" />
             </div>
 
-            <!-- Responsive 3-Part Address Breakdown -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div class="sm:col-span-1">
                 <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">City *</label>
@@ -411,16 +406,11 @@
     </section>
   </main>
 
-  <!-- Product Detail Modal (Bottom Sheet on Mobile, Centered Modal on Desktop) -->
+  <!-- Product Detail Modal -->
   <div id="product-modal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all duration-300" onclick="handleModalBackdropClick(event)">
     <div class="bg-white rounded-t-3xl sm:rounded-2xl max-w-lg w-full max-h-[85vh] sm:max-h-[90vh] flex flex-col relative overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-200 pb-safe">
-      <!-- Mobile Pull Indicator -->
       <div class="sm:hidden w-12 h-1.5 bg-gray-300 rounded-full mx-auto my-2.5 flex-shrink-0"></div>
-      
-      <!-- Close Button with 40x40px touch area -->
       <button onclick="closeModal()" class="absolute top-3 right-3 sm:top-4 sm:right-4 w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center text-xl font-bold z-10 active:scale-95 transition" aria-label="Close Product Details">&times;</button>
-      
-      <!-- Modal Content Body -->
       <div id="modal-content" class="overflow-y-auto p-5 sm:p-6"></div>
     </div>
   </div>
@@ -428,7 +418,7 @@
   <!-- Cart Drawer Backdrop Overlay -->
   <div id="cart-drawer-backdrop" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 hidden transition-opacity duration-300" onclick="toggleCartDrawer()"></div>
 
-  <!-- Cart Drawer (Full width on mobile, 384px on tablet/desktop) -->
+  <!-- Cart Drawer -->
   <div id="cart-drawer" class="fixed inset-y-0 right-0 w-full sm:w-96 max-w-full bg-white shadow-2xl z-50 p-4 sm:p-5 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col pb-safe">
     <div class="flex justify-between items-center border-b pb-3.5">
       <div class="flex items-center gap-2">
@@ -477,12 +467,15 @@
 
   <!-- Application Logic -->
   <script>
+    // ==========================================
+    // CONFIGURATION KEYS
+    // ==========================================
+    const GOOGLE_CLIENT_ID = '460683061183-9el98nqfh0djo2qc215lcmb140ini306.apps.googleusercontent.com'; // <-- PASTE YOUR OAUTH CLIENT ID HERE
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpIlXam2h512fMHLeNY-_7AX_5ixidHIOBd_ND_RzerHVjONtBKMIJTWb-QZuHtNNm/exec';
-    const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_OAUTH_CLIENT_ID.apps.googleusercontent.com';
     const CACHE_KEY = 'freshmarket_products_v3';
-    const TAX_RATE = 0.0925; // 9.25% Configurable Tax Rate
+    const TAX_RATE = 0.0925; // 9.25% Sales Tax
 
-    // Default Fallback Products Inventory (guarantees immediate rendering)
+    // Default Fallback Products Inventory
     const DEFAULT_PRODUCTS = [
       {
         id: 'p1',
@@ -595,52 +588,87 @@
 
     // Decode Google JWT Token
     function parseJwt(token) {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
-      return JSON.parse(jsonPayload);
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+      } catch (err) {
+        console.error('Failed to parse JWT payload', err);
+        return null;
+      }
     }
 
-    // Google Sign-In Handler
+    // Google Sign-In Callback Handler
     function handleCredentialResponse(response) {
       const payload = parseJwt(response.credential);
+      if (!payload) return;
+
       currentUser = {
-        name: payload.name,
-        email: payload.email,
-        picture: payload.picture
+        name: payload.name || 'Customer',
+        email: payload.email || '',
+        picture: payload.picture || 'https://via.placeholder.com/80'
       };
       localStorage.setItem('user_google_profile', JSON.stringify(currentUser));
       renderAuthUI();
       populateCheckoutProfile();
     }
 
-    // Render Google Login / User Profile Widget
+    // Initialize Google Identity Services buttons (Header + Checkout banner)
+    function initGoogleAuth() {
+      if (!window.google || !google.accounts || !google.accounts.id) return;
+
+      if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== 'YOUR_GOOGLE_OAUTH_CLIENT_ID.apps.googleusercontent.com') {
+        try {
+          google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: handleCredentialResponse,
+            auto_select: false
+          });
+
+          // 1. Render in top navigation header
+          const navBtnContainer = document.getElementById('g_id_signin_btn');
+          if (navBtnContainer) {
+            google.accounts.id.renderButton(navBtnContainer, {
+              theme: 'outline',
+              size: 'small',
+              shape: 'pill'
+            });
+          }
+
+          // 2. Render inside checkout page warning banner
+          const checkoutBtnContainer = document.getElementById('checkout-g-btn-wrapper');
+          if (checkoutBtnContainer && !currentUser) {
+            checkoutBtnContainer.innerHTML = `<div id="g_id_checkout_btn"></div>`;
+            google.accounts.id.renderButton(
+              document.getElementById('g_id_checkout_btn'),
+              { theme: 'filled_blue', size: 'large', shape: 'pill', width: 250 }
+            );
+          }
+        } catch (e) {
+          console.warn('Google Auth initialization error:', e);
+        }
+      }
+    }
+
+    // Render Auth UI in Header
     function renderAuthUI() {
       const authContainer = document.getElementById('auth-container');
       if (currentUser) {
         authContainer.innerHTML = `
-          <div class="flex items-center gap-2 bg-gray-50 border border-gray-200/80 px-2 py-1 rounded-full">
+          <div class="flex items-center gap-2 bg-gray-50 border border-gray-200/80 px-2 py-1 rounded-full shadow-2xs">
             <img src="${currentUser.picture}" class="w-7 h-7 rounded-full border border-emerald-400 object-cover" title="${currentUser.email}" alt="${currentUser.name}" />
             <span class="text-xs font-semibold text-gray-700 hidden sm:inline max-w-[100px] truncate">${currentUser.name}</span>
-            <button onclick="logout()" class="text-[11px] text-gray-400 hover:text-red-600 font-medium ml-0.5" title="Sign Out">
+            <button onclick="logout()" class="text-[11px] text-gray-400 hover:text-red-600 font-medium ml-0.5 transition" title="Sign Out">
               <i class="fa-solid fa-arrow-right-from-bracket"></i>
             </button>
           </div>
         `;
       } else {
         authContainer.innerHTML = `<div id="g_id_signin_btn"></div>`;
-        if (window.google && GOOGLE_CLIENT_ID !== 'YOUR_GOOGLE_OAUTH_CLIENT_ID.apps.googleusercontent.com') {
-          google.accounts.id.initialize({
-            client_id: GOOGLE_CLIENT_ID,
-            callback: handleCredentialResponse
-          });
-          google.accounts.id.renderButton(
-            document.getElementById('g_id_signin_btn'),
-            { theme: 'outline', size: 'small', shape: 'pill' }
-          );
-        }
+        initGoogleAuth();
       }
     }
 
@@ -649,9 +677,12 @@
       localStorage.removeItem('user_google_profile');
       renderAuthUI();
       populateCheckoutProfile();
+      if (window.google && google.accounts && google.accounts.id) {
+        google.accounts.id.disableAutoSelect();
+      }
     }
 
-    // App Initialization
+    // App Lifecycle
     async function init() {
       renderAuthUI();
       
@@ -671,7 +702,7 @@
       renderProducts();
       renderCart();
 
-      // Fetch dynamic catalog from Google Apps Script endpoint if configured
+      // Silent background catalog sync
       if (SCRIPT_URL && SCRIPT_URL.startsWith('https://')) {
         try {
           const res = await fetch(SCRIPT_URL);
@@ -684,12 +715,12 @@
             renderCart();
           }
         } catch (err) {
-          console.warn('Backend sync note (using cached/default products):', err);
+          console.warn('Backend sync note (using cached products):', err);
         }
       }
     }
 
-    // Single Page Routing & Active Navigation State
+    // Single Page Navigation
     function navigate(pageId) {
       currentPage = pageId;
       ['home', 'products', 'contact', 'checkout'].forEach(p => {
@@ -701,7 +732,7 @@
       if (target) target.classList.remove('hidden');
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
-      // Update Desktop Nav Active State
+      // Update Desktop Nav Active States
       ['home', 'products', 'contact'].forEach(p => {
         const deskBtn = document.getElementById(`desk-nav-${p}`);
         if (deskBtn) {
@@ -713,7 +744,7 @@
         }
       });
 
-      // Update Mobile Bottom Nav Active State
+      // Update Mobile Nav Active States
       ['home', 'products', 'contact'].forEach(p => {
         const mobBtn = document.getElementById(`mob-nav-${p}`);
         if (mobBtn) {
@@ -729,7 +760,6 @@
         }
       });
 
-      // Render cart and floating summary state for current page
       renderCart();
 
       if (pageId === 'checkout') {
@@ -738,11 +768,10 @@
       }
     }
 
-    // Category Controls
+    // Categories
     function renderCategories() {
       const categories = ['All', ...new Set(allProducts.map(p => p.category).filter(Boolean))];
       
-      // Horizontal swipeable pills on Products page
       const tabs = document.getElementById('category-tabs');
       tabs.innerHTML = categories.map(cat => {
         const isActive = selectedCategory === cat;
@@ -756,7 +785,6 @@
         `;
       }).join('');
 
-      // Featured Category Cards on Home Page
       const homeCats = document.getElementById('home-categories-grid');
       const iconMap = {
         'Rice & Grains': 'fa-bowl-rice',
@@ -778,7 +806,7 @@
       }).join('');
     }
 
-    // Product Search and Matching Logic
+    // Search Engine
     function matchProduct(prod, query) {
       if (!prod || !query) return false;
       const q = query.toLowerCase().trim();
@@ -791,20 +819,14 @@
 
     function onSearchInput(val) {
       const q = val.trim();
-      
-      // Sync desktop and mobile search inputs
       const deskInput = document.getElementById('desktop-search-input');
       const mobInput = document.getElementById('mobile-search-input');
       if (deskInput && deskInput.value !== val) deskInput.value = val;
       if (mobInput && mobInput.value !== val) mobInput.value = val;
 
-      // Toggle clear buttons
       document.querySelectorAll('.search-clear-btn').forEach(btn => {
-        if (q.length > 0) {
-          btn.classList.remove('hidden');
-        } else {
-          btn.classList.add('hidden');
-        }
+        if (q.length > 0) btn.classList.remove('hidden');
+        else btn.classList.add('hidden');
       });
 
       if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
@@ -836,12 +858,10 @@
       searchQuery = query.trim();
       const lowerQ = searchQuery.toLowerCase();
 
-      // Ensure user is viewing the products/catalog page
       if (currentPage !== 'products') {
         navigate('products');
       }
 
-      // Step 1: Search local cache
       const localMatches = allProducts.filter(p => matchProduct(p, lowerQ));
 
       const banner = document.getElementById('search-results-banner');
@@ -850,7 +870,7 @@
       const loadingBanner = document.getElementById('search-loading-banner');
       const categoryTabs = document.getElementById('category-tabs-container');
 
-      if (categoryTabs) categoryTabs.classList.add('hidden'); // Hide category tabs during active search
+      if (categoryTabs) categoryTabs.classList.add('hidden');
 
       if (localMatches.length > 0) {
         if (loadingBanner) loadingBanner.classList.add('hidden');
@@ -863,14 +883,13 @@
         return;
       }
 
-      // Step 2: No local match found - fallback to Google Apps Script endpoint
+      // Online Apps Script Search Fallback
       if (SCRIPT_URL && SCRIPT_URL.startsWith('https://') && searchQuery.length >= 2) {
         setSearchLoadingState(true);
         if (banner) banner.classList.add('hidden');
         if (loadingBanner) loadingBanner.classList.remove('hidden');
 
         try {
-          // Attempt searching via Apps Script query param or full fresh fetch
           const searchUrl = SCRIPT_URL.includes('?') 
             ? `${SCRIPT_URL}&q=${encodeURIComponent(searchQuery)}` 
             : `${SCRIPT_URL}?q=${encodeURIComponent(searchQuery)}`;
@@ -880,8 +899,6 @@
 
           if (Array.isArray(freshData) && freshData.length > 0) {
             const normalizedFresh = freshData.map(normalizeProduct).filter(Boolean);
-
-            // Merge newly fetched products into allProducts avoiding duplicates by ID
             const existingIds = new Set(allProducts.map(p => p.id));
             let addedCount = 0;
             normalizedFresh.forEach(item => {
@@ -897,9 +914,7 @@
               renderCategories();
             }
 
-            // Re-evaluate search against newly merged catalog
             const remoteMatches = allProducts.filter(p => matchProduct(p, lowerQ));
-
             setSearchLoadingState(false);
             if (loadingBanner) loadingBanner.classList.add('hidden');
 
@@ -914,20 +929,19 @@
             }
           }
         } catch (err) {
-          console.warn('Apps Script search error, falling back to local empty state:', err);
+          console.warn('Apps Script search error:', err);
         }
 
         setSearchLoadingState(false);
         if (loadingBanner) loadingBanner.classList.add('hidden');
       }
 
-      // No results found in local cache or remote Apps Script
       if (banner) {
         banner.classList.remove('hidden');
         if (queryDisplay) queryDisplay.innerText = `"${searchQuery}"`;
         if (matchCount) matchCount.innerText = 0;
       }
-      renderFilteredProducts([], `No products matching "${searchQuery}" found in local catalog or online inventory.`);
+      renderFilteredProducts([], `No products matching "${searchQuery}" found in catalog.`);
     }
 
     function setSearchLoadingState(isLoading) {
@@ -981,7 +995,7 @@
       renderProducts();
     }
 
-    // Render 2-Column Responsive Product Catalog
+    // Products Grid
     function renderProducts() {
       const filtered = selectedCategory === 'All' 
         ? allProducts 
@@ -1015,7 +1029,6 @@
         return `
           <div class="bg-white rounded-2xl border border-gray-200/80 shadow-xs overflow-hidden flex flex-col justify-between hover:shadow-md transition duration-200 group">
             
-            <!-- Product Image -->
             <div class="relative aspect-square w-full bg-gray-100 overflow-hidden">
               ${imgBlock}
               <span class="absolute top-2 left-2 bg-emerald-700/80 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
@@ -1023,7 +1036,6 @@
               </span>
             </div>
 
-            <!-- Product Info & Actions -->
             <div class="p-3 sm:p-4 flex flex-col flex-grow justify-between">
               <div>
                 <h3 class="font-bold text-xs sm:text-sm text-gray-900 cursor-pointer line-clamp-2 leading-snug hover:text-emerald-600 transition" onclick="openModal('${safeId}')">
@@ -1033,7 +1045,6 @@
                 <div class="font-black text-sm sm:text-base text-emerald-700 mt-1.5">$${Number(prod.price || 0).toFixed(2)}</div>
               </div>
 
-              <!-- Quantity Selector & Add Button -->
               <div class="mt-3 pt-2.5 border-t border-gray-100">
                 <div class="flex items-center justify-between mb-2">
                   <span class="text-[11px] font-semibold text-gray-500">Qty:</span>
@@ -1063,7 +1074,7 @@
       if (el) el.innerText = next;
     }
 
-    // Modal & Bottom Sheet Handlers
+    // Modal Details
     function openModal(prodId) {
       const safeId = String(prodId);
       const prod = allProducts.find(p => String(p.id) === safeId);
@@ -1101,7 +1112,6 @@
       }
     }
 
-    // Enhanced Button Feedback Helper
     function handleAddToCartClick(btnEl, prodId) {
       addToCart(prodId);
       if (btnEl) {
@@ -1115,14 +1125,11 @@
       }
     }
 
-    // Cart Handlers
+    // Cart Operations
     function addToCart(prodId) {
       const safeId = String(prodId);
       const prod = allProducts.find(p => String(p.id) === safeId);
-      if (!prod) {
-        console.warn('Product not found for ID:', prodId);
-        return;
-      }
+      if (!prod) return;
 
       const qtyToAdd = parseInt(localQtyState[safeId], 10) || 1;
       const existing = cart.find(item => String(item.id) === safeId);
@@ -1145,13 +1152,12 @@
       saveCart();
       renderCart();
 
-      // Trigger Badge Bounce Animation on both Top and Mobile Bottom Badges
       const badge = document.getElementById('cart-badge');
       const mobBadge = document.getElementById('mob-cart-badge');
       [badge, mobBadge].forEach(b => {
         if (b) {
           b.classList.remove('scale-125', 'bg-amber-500');
-          void b.offsetWidth; // Trigger reflow for animation restart
+          void b.offsetWidth;
           b.classList.add('scale-125', 'bg-amber-500');
           setTimeout(() => {
             b.classList.remove('scale-125', 'bg-amber-500');
@@ -1159,7 +1165,6 @@
         }
       });
 
-      // Mobile tactile feedback
       try {
         if (window.navigator && window.navigator.vibrate) {
           window.navigator.vibrate(40);
@@ -1233,10 +1238,8 @@
 
       if (badge) badge.innerText = totalCount;
       if (mobBadge) mobBadge.innerText = totalCount;
-
       if (cartTaxRateEl) cartTaxRateEl.innerText = getTaxRateDisplay();
 
-      // Update mobile floating quick cart bar
       if (floatingCount) floatingCount.innerText = totalCount;
       if (floatingTotal) floatingTotal.innerText = `$${grandTotal.toFixed(2)}`;
       if (floatingBar) {
@@ -1310,7 +1313,7 @@
       }
     }
 
-    // Checkout Navigation & Population
+    // Checkout
     function goToCheckoutPage() {
       if (cart.length === 0) {
         alert('Your cart is empty! Add products before checking out.');
@@ -1325,19 +1328,26 @@
       const mainView = document.getElementById('checkout-main-view');
 
       if (!currentUser) {
-        authWarning.classList.remove('hidden');
-        mainView.classList.add('opacity-40', 'pointer-events-none');
+        if (authWarning) authWarning.classList.remove('hidden');
+        if (mainView) mainView.classList.add('opacity-40', 'pointer-events-none');
+        initGoogleAuth(); // Ensure button renders in the warning banner
         return;
       }
 
-      authWarning.classList.add('hidden');
-      mainView.classList.remove('opacity-40', 'pointer-events-none');
+      if (authWarning) authWarning.classList.add('hidden');
+      if (mainView) mainView.classList.remove('opacity-40', 'pointer-events-none');
 
-      document.getElementById('checkout-avatar').src = currentUser.picture;
-      document.getElementById('checkout-display-name').innerText = currentUser.name;
-      document.getElementById('checkout-display-email').innerText = currentUser.email;
-      document.getElementById('cust-name-input').value = currentUser.name;
-      document.getElementById('cust-email-input').value = currentUser.email;
+      const avatar = document.getElementById('checkout-avatar');
+      const dispName = document.getElementById('checkout-display-name');
+      const dispEmail = document.getElementById('checkout-display-email');
+      const inputName = document.getElementById('cust-name-input');
+      const inputEmail = document.getElementById('cust-email-input');
+
+      if (avatar) avatar.src = currentUser.picture;
+      if (dispName) dispName.innerText = currentUser.name;
+      if (dispEmail) dispEmail.innerText = currentUser.email;
+      if (inputName) inputName.value = currentUser.name;
+      if (inputEmail) inputEmail.value = currentUser.email;
     }
 
     function renderCheckoutSummary() {
@@ -1350,7 +1360,7 @@
       if (taxRateLabelEl) taxRateLabelEl.innerText = getTaxRateDisplay();
 
       if (cart.length === 0) {
-        itemsList.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">No items selected.</p>';
+        if (itemsList) itemsList.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">No items selected.</p>';
         if (subtotalEl) subtotalEl.innerText = '$0.00';
         if (taxEl) taxEl.innerText = '$0.00';
         if (totalEl) totalEl.innerText = '$0.00';
@@ -1361,15 +1371,17 @@
       const tax = getCartTax(subtotal);
       const grandTotal = subtotal + tax;
 
-      itemsList.innerHTML = cart.map(item => `
-        <div class="flex justify-between items-center text-xs py-1 border-b border-gray-50">
-          <div class="truncate mr-2">
-            <span class="font-semibold text-gray-800">${item.name}</span>
-            <span class="text-gray-400"> (x${item.qty})</span>
+      if (itemsList) {
+        itemsList.innerHTML = cart.map(item => `
+          <div class="flex justify-between items-center text-xs py-1 border-b border-gray-50">
+            <div class="truncate mr-2">
+              <span class="font-semibold text-gray-800">${item.name}</span>
+              <span class="text-gray-400"> (x${item.qty})</span>
+            </div>
+            <span class="font-bold text-gray-900 flex-shrink-0">$${(Number(item.price) * parseInt(item.qty, 10)).toFixed(2)}</span>
           </div>
-          <span class="font-bold text-gray-900 flex-shrink-0">$${(Number(item.price) * parseInt(item.qty, 10)).toFixed(2)}</span>
-        </div>
-      `).join('');
+        `).join('');
+      }
 
       if (subtotalEl) subtotalEl.innerText = `$${subtotal.toFixed(2)}`;
       if (taxEl) taxEl.innerText = `$${tax.toFixed(2)}`;
@@ -1389,7 +1401,7 @@
       }
     }
 
-    // Submit Order Action
+    // Submit Order Handlers
     function submitCheckoutOrder(e) {
       e.preventDefault();
 
@@ -1412,7 +1424,6 @@
       const tax = getCartTax(subtotal);
       const grandTotal = subtotal + tax;
 
-      // Show Confirmation Modal with itemized breakdown
       document.getElementById('success-order-details').innerHTML = `
         Thank you, <strong>${currentUser.name}</strong>!<br>
         Your order <strong>#${orderId}</strong> for <strong>$${grandTotal.toFixed(2)}</strong> has been received.<br><br>
@@ -1428,7 +1439,6 @@
         </span>
       `;
 
-      // Reset cart and fields
       cart = [];
       saveCart();
       renderCart();
