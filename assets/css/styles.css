@@ -1,0 +1,49 @@
+/* ==========================================================================
+   SpiceMart (FreshMarket) - Global & Mobile-Optimized Stylesheet
+   ========================================================================== */
+
+/* Universal Reset & Tap Enhancements */
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Scrollbar Suppression Utility for horizontal category chips */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* iOS Input Auto-Zoom Prevention (Ensures 16px font size on small screens) */
+@media screen and (max-width: 768px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Safe Area Insets for notched phones (iPhone X/11/12/13/14/15/16) */
+.pb-safe {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}
+
+.pt-safe {
+  padding-top: max(0.75rem, env(safe-area-inset-top));
+}
+
+/* Custom interactive active states */
+.active-scale-98:active {
+  transform: scale(0.98);
+}
+
+.active-scale-95:active {
+  transform: scale(0.95);
+}
