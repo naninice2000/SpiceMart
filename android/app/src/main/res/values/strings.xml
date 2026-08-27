@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SpiceMart</string>
+    <string name="app_url">https://naninice2000.github.io/SpiceMart/</string>
+    <string name="offline_title">No Internet Connection</string>
+    <string name="offline_message">Please check your Wi-Fi or mobile data connection and try again to view products and place orders.</string>
+    <string name="btn_retry">Retry Connection</string>
+    <string name="loading">Loading SpiceMart…</string>
+</resources>
