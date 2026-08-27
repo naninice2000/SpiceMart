@@ -2,9 +2,11 @@
    SpiceMart (FreshMarket) - Client-Side Application Logic
    ========================================================================== */
 
-// ==========================================
-    // CONFIGURATION KEYS
     // ==========================================
+    // STORE CONFIGURATION KEYS
+    // ==========================================
+    const STORE_NAME = 'SpiceMart'; // <<< Change Store Name in this ONE single place!
+    const STORE_TAGLINE = 'Pure Spices & Daily Groceries';
     const GOOGLE_CLIENT_ID = '460683061183-9el98nqfh0djo2qc215lcmb140ini306.apps.googleusercontent.com';
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpIlXam2h512fMHLeNY-_7AX_5ixidHIOBd_ND_RzerHVjONtBKMIJTWb-QZuHtNNm/exec'; // Products catalog & search
     const ORDERS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxR3iwqfM0ya7XtBpUjQGFsjAEuSgge6h8Ea5PwDNB0992-y8r6ZcF2SPtdQpSTHBo9Tw/exec'; // Orders processing, Google Sheet storage, PDF invoice & email dispatch
@@ -226,8 +228,25 @@
       }
     }
 
+    // Brand & Store Configuration Manager
+    function applyStoreBranding() {
+      // 1. Update Browser Tab Title
+      document.title = `${STORE_NAME} Store`;
+      
+      // 2. Update all elements displaying Store Name
+      document.querySelectorAll('.store-name-text').forEach(el => {
+        el.innerText = STORE_NAME;
+      });
+
+      // 3. Update any elements displaying Store Tagline
+      document.querySelectorAll('.store-tagline-text').forEach(el => {
+        el.innerText = STORE_TAGLINE;
+      });
+    }
+
     // App Lifecycle
     async function init() {
+      applyStoreBranding();
       renderAuthUI();
       
       const cached = localStorage.getItem(CACHE_KEY);
