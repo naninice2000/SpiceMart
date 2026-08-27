@@ -310,7 +310,14 @@
           
           <!-- Logged-in Google Profile Info Display -->
           <div class="flex items-center gap-3 p-3.5 bg-emerald-50/80 border border-emerald-200 rounded-xl mb-6">
-            <img id="checkout-avatar" src="" class="w-11 h-11 rounded-full border-2 border-emerald-400 object-cover flex-shrink-0" alt="Customer Profile" />
+            <img 
+              id="checkout-avatar" 
+              src="" 
+              referrerpolicy="no-referrer"
+              onerror="this.src='https://ui-avatars.com/api/?name=Customer&background=059669&color=fff'"
+              class="w-11 h-11 rounded-full border-2 border-emerald-400 object-cover flex-shrink-0" 
+              alt="Customer Profile" 
+            />
             <div class="min-w-0 flex-1">
               <div class="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">Signed In Customer</div>
               <div id="checkout-display-name" class="font-bold text-sm sm:text-base text-gray-900 truncate"></div>
@@ -470,7 +477,7 @@
     // ==========================================
     // CONFIGURATION KEYS
     // ==========================================
-    const GOOGLE_CLIENT_ID = '460683061183-9el98nqfh0djo2qc215lcmb140ini306.apps.googleusercontent.com'; // <-- PASTE YOUR OAUTH CLIENT ID HERE
+    const GOOGLE_CLIENT_ID = '460683061183-9el98nqfh0djo2qc215lcmb140ini306.apps.googleusercontent.com';
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpIlXam2h512fMHLeNY-_7AX_5ixidHIOBd_ND_RzerHVjONtBKMIJTWb-QZuHtNNm/exec';
     const CACHE_KEY = 'freshmarket_products_v3';
     const TAX_RATE = 0.0925; // 9.25% Sales Tax
@@ -609,7 +616,7 @@
       currentUser = {
         name: payload.name || 'Customer',
         email: payload.email || '',
-        picture: payload.picture || 'https://via.placeholder.com/80'
+        picture: payload.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(payload.name || 'Customer')}&background=059669&color=fff`
       };
       localStorage.setItem('user_google_profile', JSON.stringify(currentUser));
       renderAuthUI();
@@ -653,13 +660,21 @@
       }
     }
 
-    // Render Auth UI in Header
+    // Render Auth UI in Header with Referrer Policy and Fallbacks
     function renderAuthUI() {
       const authContainer = document.getElementById('auth-container');
       if (currentUser) {
+        const avatarUrl = currentUser.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name)}&background=059669&color=fff`;
         authContainer.innerHTML = `
           <div class="flex items-center gap-2 bg-gray-50 border border-gray-200/80 px-2 py-1 rounded-full shadow-2xs">
-            <img src="${currentUser.picture}" class="w-7 h-7 rounded-full border border-emerald-400 object-cover" title="${currentUser.email}" alt="${currentUser.name}" />
+            <img 
+              src="${avatarUrl}" 
+              referrerpolicy="no-referrer"
+              onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name)}&background=059669&color=fff'"
+              class="w-7 h-7 rounded-full border border-emerald-400 object-cover" 
+              title="${currentUser.email}" 
+              alt="${currentUser.name}" 
+            />
             <span class="text-xs font-semibold text-gray-700 hidden sm:inline max-w-[100px] truncate">${currentUser.name}</span>
             <button onclick="logout()" class="text-[11px] text-gray-400 hover:text-red-600 font-medium ml-0.5 transition" title="Sign Out">
               <i class="fa-solid fa-arrow-right-from-bracket"></i>
@@ -1330,7 +1345,7 @@
       if (!currentUser) {
         if (authWarning) authWarning.classList.remove('hidden');
         if (mainView) mainView.classList.add('opacity-40', 'pointer-events-none');
-        initGoogleAuth(); // Ensure button renders in the warning banner
+        initGoogleAuth();
         return;
       }
 
@@ -1343,7 +1358,9 @@
       const inputName = document.getElementById('cust-name-input');
       const inputEmail = document.getElementById('cust-email-input');
 
-      if (avatar) avatar.src = currentUser.picture;
+      if (avatar) {
+        avatar.src = currentUser.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name)}&background=059669&color=fff`;
+      }
       if (dispName) dispName.innerText = currentUser.name;
       if (dispEmail) dispEmail.innerText = currentUser.email;
       if (inputName) inputName.value = currentUser.name;
