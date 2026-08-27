@@ -1,0 +1,18 @@
+{
+  "name": "SpiceMart",
+  "short_name": "SpiceMart",
+  "description": "Pure Spices, Rice & Authentic Groceries",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#059669",
+  "theme_color": "#059669",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/images/Alibaba Gold Basmati Rice.jpg",
+      "sizes": "192x192 512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
