@@ -10,7 +10,7 @@
     const GOOGLE_CLIENT_ID = '460683061183-9el98nqfh0djo2qc215lcmb140ini306.apps.googleusercontent.com';
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpIlXam2h512fMHLeNY-_7AX_5ixidHIOBd_ND_RzerHVjONtBKMIJTWb-QZuHtNNm/exec'; // Products catalog & search
     const ORDERS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxR3iwqfM0ya7XtBpUjQGFsjAEuSgge6h8Ea5PwDNB0992-y8r6ZcF2SPtdQpSTHBo9Tw/exec'; // Orders processing, Google Sheet storage, PDF invoice & email dispatch
-    const CACHE_KEY = 'freshmarket_products_v3';
+    const CACHE_KEY = 'spicemart_products_v6';
     const TAX_RATE = 0.0825; // 8.25% Sales Tax
 
     // Default Fallback Products Inventory
@@ -87,17 +87,53 @@
       }
     ];
 
+    function resolveProductImageUrl(item) {
+      if (!item) return '';
+
+      // 1. Direct explicit image_url if valid
+      const direct = item.image_url ?? item.Image_URL ?? item.image ?? item.Image;
+      if (direct && typeof direct === 'string' && direct.trim() !== '' && direct !== 'null' && direct !== 'undefined') {
+        const clean = direct.trim();
+        if (clean.startsWith('http://') || clean.startsWith('https://') || clean.startsWith('assets/')) {
+          return clean;
+        }
+        return `assets/images/${clean}`;
+      }
+
+      // 2. Picture name from Google Apps Script (e.g. "Alibaba Gold Basmati Rice.jpg")
+      const pic = item.picture_name ?? item.Picture_Name ?? item.picture ?? item.Picture;
+      if (pic && typeof pic === 'string' && pic.trim() !== '' && pic !== 'null' && pic !== 'undefined') {
+        const cleanPic = pic.trim();
+        if (cleanPic.startsWith('http://') || cleanPic.startsWith('https://') || cleanPic.startsWith('assets/')) {
+          return cleanPic;
+        }
+        return `assets/images/${cleanPic}`;
+      }
+
+      // 3. Match product title keywords to local high-res asset photos
+      const name = String(item.name ?? item.Name ?? item.title ?? '').toLowerCase();
+      if (name.includes('alibaba')) return 'assets/images/Alibaba Gold Basmati Rice.jpg';
+      if (name.includes('roshan')) return 'assets/images/Roshan Basmati Rice.jpg';
+      if (name.includes('cardamom')) return 'assets/images/Black Cardamom.jpg';
+      if (name.includes('pepper')) return 'assets/images/Black Pepper.jpg';
+      if (name.includes('turmeric')) return 'assets/images/Whole Turmeric.jpg';
+      if (name.includes('fenugreek') || name.includes('kasuri')) return 'assets/images/Fenugreek Leaves.jpg';
+      if (name.includes('rosemary')) return 'assets/images/Rosemary.jpg';
+
+      return '';
+    }
+
     function normalizeProduct(item, idx) {
       if (!item) return null;
       return {
         id: String(item.id ?? item.ID ?? item.item_id ?? item.itemId ?? `p_${idx + 1}`),
         name: String(item.name ?? item.Name ?? item.title ?? item.Title ?? 'Grocery Item'),
         price: Number(item.price ?? item.Price ?? 0),
-        category: String(item.category ?? item.Category ?? 'General'),
-        quantity: String(item.quantity ?? item.Quantity ?? item.unit ?? item.Unit ?? '1 Unit'),
+        category: String(item.category ?? item.Category ?? 'General').trim(),
+        quantity: String(item.quantity ?? item.Quantity ?? item.unit ?? item.Unit ?? '1 Unit').trim(),
         inventory: String(item.inventory ?? item.Inventory ?? item.stock ?? item.Stock ?? 'In Stock'),
         description: String(item.description ?? item.Description ?? ''),
-        image_url: String(item.image_url ?? item.Image_URL ?? item.image ?? item.Image ?? '')
+        image_url: resolveProductImageUrl(item)
       };
     }
 
@@ -585,9 +621,16 @@
       grid.innerHTML = productsList.map(prod => {
         const safeId = String(prod.id);
         const qty = localQtyState[safeId] || 1;
-        const imgBlock = prod.image_url 
-          ? `<img src="${prod.image_url}" alt="${prod.name}" loading="lazy" onerror="this.outerHTML='<div class=\\'w-full h-full bg-gray-100 flex items-center justify-center text-gray-400 text-xs italic\\'>No Image</div>'" class="w-full h-full object-cover cursor-pointer group-hover:scale-105 transition duration-300" onclick="openModal('${safeId}')" />`
-          : `<div onclick="openModal('${safeId}')" class="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400 text-xs italic cursor-pointer">No Image</div>`;
+        const safeImgSrc = prod.image_url ? encodeURI(prod.image_url) : '';
+        const placeholderHtml = `
+          <div onclick="openModal('${safeId}')" class="w-full h-full bg-gray-100/90 flex flex-col items-center justify-center text-gray-400 p-2 text-center select-none cursor-pointer hover:bg-gray-200/60 transition">
+            <i class="fa-regular fa-image text-2xl mb-1 text-gray-300"></i>
+            <span class="text-[11px] font-semibold text-gray-500">Image Not Available</span>
+          </div>
+        `;
+        const imgBlock = safeImgSrc 
+          ? `<img src="${safeImgSrc}" alt="${prod.name}" loading="lazy" onerror="this.outerHTML='<div class=\\'w-full h-full bg-gray-100 flex flex-col items-center justify-center text-gray-400 p-2 text-center select-none\\'><i class=\\'fa-regular fa-image text-2xl mb-1 text-gray-300\\'></i><span class=\\'text-[11px] font-semibold text-gray-500\\'>Image Not Available</span></div>';" class="w-full h-full object-cover cursor-pointer group-hover:scale-105 transition duration-300" onclick="openModal('${safeId}')" />`
+          : placeholderHtml;
 
         return `
           <div class="bg-white rounded-2xl border border-gray-200/80 shadow-xs overflow-hidden flex flex-col justify-between hover:shadow-md transition duration-200 group">
@@ -643,9 +686,10 @@
       const prod = allProducts.find(p => String(p.id) === safeId);
       if (!prod) return;
 
-      const imgBlock = prod.image_url 
-        ? `<img src="${prod.image_url}" alt="${prod.name}" class="w-full h-48 sm:h-60 object-cover rounded-2xl mb-4 shadow-xs" />`
-        : `<div class="w-full h-40 bg-gray-100 flex items-center justify-center text-gray-400 text-sm italic rounded-2xl mb-4">No Image Available</div>`;
+      const safeImgSrc = prod.image_url ? encodeURI(prod.image_url) : '';
+      const imgBlock = safeImgSrc 
+        ? `<img src="${safeImgSrc}" alt="${prod.name}" onerror="this.outerHTML='<div class=\\'w-full h-48 sm:h-56 bg-gray-100 flex flex-col items-center justify-center text-gray-400 rounded-2xl mb-4 p-4 text-center select-none border border-gray-200/60\\'><i class=\\'fa-regular fa-image text-3xl mb-1.5 text-gray-300\\'></i><span class=\\'text-xs font-semibold text-gray-500\\'>Image Not Available</span></div>';" class="w-full h-48 sm:h-60 object-cover rounded-2xl mb-4 shadow-xs" />`
+        : `<div class="w-full h-48 sm:h-56 bg-gray-100 flex flex-col items-center justify-center text-gray-400 rounded-2xl mb-4 p-4 text-center select-none border border-gray-200/60"><i class="fa-regular fa-image text-3xl mb-1.5 text-gray-300"></i><span class="text-xs font-semibold text-gray-500">Image Not Available</span></div>`;
 
       document.getElementById('modal-content').innerHTML = `
         ${imgBlock}
