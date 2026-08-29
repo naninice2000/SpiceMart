@@ -10,6 +10,7 @@
     const GOOGLE_CLIENT_ID = '460683061183-9el98nqfh0djo2qc215lcmb140ini306.apps.googleusercontent.com';
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpIlXam2h512fMHLeNY-_7AX_5ixidHIOBd_ND_RzerHVjONtBKMIJTWb-QZuHtNNm/exec'; // Products catalog & search
     const ORDERS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxR3iwqfM0ya7XtBpUjQGFsjAEuSgge6h8Ea5PwDNB0992-y8r6ZcF2SPtdQpSTHBo9Tw/exec'; // Orders processing, Google Sheet storage, PDF invoice & email dispatch
+    const CUSTOMERS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4PRY6G_MN0wtNg5_Hgwzp3XyYFoO_sr0Jf6WSCk2qMZQeP7kKe8i05dVkQn_7pjE4NQ/exec'; // CustomerManagement (Profiles & Addresses)
     const CACHE_KEY = 'spicemart_products_v6';
     const TAX_RATE = 0.0825; // 8.25% Sales Tax
     const GOOGLE_MAPS_API_KEY = 'AIzaSyDOq7G_nS3SfFjTHVdI_lrYTK1Jofzf4nE'; // Optional Google Maps Platform API Key (Places & Geocoding)
@@ -436,11 +437,17 @@
     function logout() {
       currentUser = null;
       localStorage.removeItem('user_google_profile');
+      localStorage.removeItem('user_saved_address');
       renderAuthUI();
       populateCheckoutProfile();
       if (window.google && google.accounts && google.accounts.id) {
-        google.accounts.id.disableAutoSelect();
+        try {
+          google.accounts.id.disableAutoSelect();
+        } catch (e) {}
       }
+      try {
+        document.cookie = 'g_state=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      } catch (e) {}
     }
 
     // Brand & Store Configuration Manager
@@ -1110,6 +1117,57 @@
       navigate('checkout');
     }
 
+    // Fetch Customer's Saved Delivery Address from 'CustomerManagement' Google Sheet
+    async function fetchCustomerProfile(email) {
+      if (!email) return;
+      const targetEndpoint = (typeof CUSTOMERS_SCRIPT_URL !== 'undefined' && CUSTOMERS_SCRIPT_URL) ? CUSTOMERS_SCRIPT_URL : (typeof ORDERS_SCRIPT_URL !== 'undefined' ? ORDERS_SCRIPT_URL : SCRIPT_URL);
+      if (!targetEndpoint || !targetEndpoint.startsWith('https://')) return;
+
+      try {
+        const url = `${targetEndpoint}?action=getCustomer&email=${encodeURIComponent(email)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data && data.success && data.customer) {
+          localStorage.setItem('user_saved_address', JSON.stringify(data.customer));
+          populateSavedAddress(data.customer, true);
+        }
+      } catch (err) {
+        console.warn('Customer profile fetch note:', err);
+      }
+    }
+
+    function populateSavedAddress(cust, showToast = false) {
+      if (!cust) return;
+      const phoneInput = document.getElementById('cust-phone-input');
+      const addrTypeInput = document.getElementById('cust-addr-type-input');
+      const bNameInput = document.getElementById('cust-business-name-input');
+      const streetInput = document.getElementById('cust-street-input');
+      const cityInput = document.getElementById('cust-city-input');
+      const stateInput = document.getElementById('cust-state-input');
+      const zipInput = document.getElementById('cust-zip-input');
+
+      if (phoneInput && cust.phone) phoneInput.value = cust.phone;
+      if (addrTypeInput && cust.addrType) {
+        addrTypeInput.value = cust.addrType;
+        handleAddressTypeChange();
+      }
+      if (bNameInput && cust.businessName) bNameInput.value = cust.businessName;
+      if (streetInput && cust.street) streetInput.value = cust.street;
+      if (cityInput && cust.city) cityInput.value = cust.city;
+      if (stateInput && cust.state) stateInput.value = cust.state;
+      if (zipInput && cust.zip) zipInput.value = cust.zip;
+
+      clearAllAddressErrors();
+
+      const toast = document.getElementById('address-loaded-toast');
+      if (toast && showToast && (cust.street || cust.city)) {
+        toast.classList.remove('hidden');
+        setTimeout(() => {
+          if (toast) toast.classList.add('hidden');
+        }, 6000);
+      }
+    }
+
     function populateCheckoutProfile() {
       const authWarning = document.getElementById('checkout-auth-warning');
       const mainView = document.getElementById('checkout-main-view');
@@ -1137,6 +1195,20 @@
       if (dispEmail) dispEmail.innerText = currentUser.email;
       if (inputName) inputName.value = currentUser.name;
       if (inputEmail) inputEmail.value = currentUser.email;
+
+      // 1. Instant prefill from cached address
+      try {
+        const cached = localStorage.getItem('user_saved_address');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          populateSavedAddress(parsed, false);
+        }
+      } catch (e) {}
+
+      // 2. Fetch freshest address mapping from Google Sheet
+      if (currentUser.email) {
+        fetchCustomerProfile(currentUser.email);
+      }
 
       initGoogleMapsPlaces();
       attachAddressValidationListeners();
@@ -1504,6 +1576,20 @@
       const tax = getCartTax(subtotal);
       const grandTotal = subtotal + tax;
 
+      // Cache customer address locally for future checkouts
+      const savedAddressObj = {
+        name: currentUser.name,
+        email: currentUser.email,
+        phone: phone,
+        addrType: isBusiness ? 'Commercial' : 'Residential',
+        businessName: bName,
+        street: street,
+        city: city,
+        state: state,
+        zip: zip
+      };
+      localStorage.setItem('user_saved_address', JSON.stringify(savedAddressObj));
+
       const now = new Date();
       const orderPayload = {
         action: 'createOrder',
@@ -1513,8 +1599,13 @@
         date: now.toLocaleDateString(),
         orderTimestamp: now.toLocaleString(),
         address: street,
+        street: street,
         city: city,
         state: `${state} ${zip}`,
+        stateOnly: state,
+        zip: zip,
+        addrType: isBusiness ? 'Commercial' : 'Residential',
+        businessName: bName,
         orderId: orderId,
         orderedItems: cart.map(it => `${it.name} (x${it.qty}) - $${(Number(it.price) * it.qty).toFixed(2)}`).join(', '),
         items: cart.map(it => ({

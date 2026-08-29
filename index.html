@@ -299,6 +299,17 @@
             </div>
           </div>
 
+          <!-- Saved Address Loaded Banner -->
+          <div id="address-loaded-toast" class="hidden mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between gap-2 text-emerald-800 text-xs">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-cloud-arrow-down text-emerald-600 text-sm"></i>
+              <span><strong>Saved Address Loaded:</strong> We pre-filled your delivery details from your account!</span>
+            </div>
+            <button type="button" onclick="document.getElementById('address-loaded-toast').classList.add('hidden')" class="text-emerald-600 hover:text-emerald-900 cursor-pointer">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
           <form id="checkout-order-form" onsubmit="submitCheckoutOrder(event)" novalidate class="space-y-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -467,8 +478,8 @@
     </div>
   </div>
 
-  <!-- Application Logic -->
-  <script src="assets/js/app.js"></script>
+  <!-- Application Logic (v2.2) -->
+  <script src="assets/js/app.js?v=2.2"></script>
   
 </body>
 </html>
