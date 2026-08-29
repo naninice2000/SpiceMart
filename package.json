@@ -1,0 +1,19 @@
+{
+  "name": "spicemart-web-tests",
+  "version": "1.0.0",
+  "description": "End-to-End Automated Test Suite for SpiceMart Web Application",
+  "scripts": {
+    "test": "playwright test",
+    "test:e2e": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:report": "playwright show-report"
+  },
+  "keywords": ["spicemart", "playwright", "test-automation", "e2e"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.51.0",
+    "serve": "^14.2.4"
+  }
+}
