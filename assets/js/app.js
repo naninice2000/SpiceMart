@@ -229,14 +229,48 @@
       }
     }
 
-    // Direct Universal Google OAuth Login Flow (100% Reliable across iPhone, Android, and Web)
+    let tokenClient = null;
+
+    // Fetch and populate user profile from Google OAuth2 Access Token
+    async function fetchUserProfile(accessToken) {
+      try {
+        const res = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`);
+        const userInfo = await res.json();
+        if (userInfo && userInfo.email) {
+          currentUser = {
+            name: userInfo.name || 'Customer',
+            email: userInfo.email,
+            picture: userInfo.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(userInfo.name || 'Customer')}&background=059669&color=fff`
+          };
+          localStorage.setItem('user_google_profile', JSON.stringify(currentUser));
+          if (window.history && window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.pathname);
+          }
+          renderAuthUI();
+          populateCheckoutProfile();
+        }
+      } catch (err) {
+        console.warn('OAuth userinfo fetch note:', err);
+      }
+    }
+
+    // Direct Universal Google OAuth Login Flow (Token Client Popup + GIS Fallback)
     function startGoogleLogin() {
-      // First, try Google Identity Services prompt if available
+      // 1. First priority: Google OAuth2 Token Client Popup (No redirect_uri_mismatch!)
+      if (tokenClient) {
+        try {
+          tokenClient.requestAccessToken({ prompt: 'select_account' });
+          return;
+        } catch (e) {
+          console.warn('Token client request note:', e);
+        }
+      }
+
+      // 2. Secondary fallback: Google Identity Services prompt
       if (window.google && google.accounts && google.accounts.id) {
         try {
           google.accounts.id.prompt((notification) => {
             if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-              // Fallback to standard OAuth redirect
               launchDirectGoogleOAuth();
             }
           });
@@ -249,7 +283,8 @@
     }
 
     function launchDirectGoogleOAuth() {
-      const redirectUri = window.location.origin + window.location.pathname;
+      const cleanPath = window.location.pathname.endsWith('/index.html') ? window.location.pathname : window.location.pathname;
+      const redirectUri = window.location.origin + cleanPath;
       const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
         `client_id=${encodeURIComponent(GOOGLE_CLIENT_ID)}` +
         `&redirect_uri=${encodeURIComponent(redirectUri)}` +
@@ -276,19 +311,39 @@
       populateCheckoutProfile();
     }
 
-    // Initialize Google Identity Services
+    // Initialize Google Identity Services & OAuth2 Token Client
     function initGoogleAuth() {
-      if (!window.google || !google.accounts || !google.accounts.id) return;
+      if (!window.google || !google.accounts) return;
 
       if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== 'YOUR_GOOGLE_OAUTH_CLIENT_ID.apps.googleusercontent.com') {
-        try {
-          google.accounts.id.initialize({
-            client_id: GOOGLE_CLIENT_ID,
-            callback: handleCredentialResponse,
-            auto_select: false
-          });
-        } catch (e) {
-          console.warn('Google Auth init note:', e);
+        // Initialize GIS ID Service
+        if (google.accounts.id) {
+          try {
+            google.accounts.id.initialize({
+              client_id: GOOGLE_CLIENT_ID,
+              callback: handleCredentialResponse,
+              auto_select: false
+            });
+          } catch (e) {
+            console.warn('Google Auth ID init note:', e);
+          }
+        }
+
+        // Initialize GIS OAuth2 Token Client (Popup flow)
+        if (google.accounts.oauth2) {
+          try {
+            tokenClient = google.accounts.oauth2.initTokenClient({
+              client_id: GOOGLE_CLIENT_ID,
+              scope: 'openid profile email',
+              callback: (tokenResponse) => {
+                if (tokenResponse && tokenResponse.access_token) {
+                  fetchUserProfile(tokenResponse.access_token);
+                }
+              }
+            });
+          } catch (e) {
+            console.warn('Google OAuth2 Token Client init note:', e);
+          }
         }
       }
     }
