@@ -156,7 +156,7 @@
             Handpicked premium rice, organic whole spices, and authentic pantry essentials directly to your doorstep.
           </p>
           <div class="flex flex-wrap gap-3">
-            <button onclick="navigate('products')" class="bg-white text-emerald-800 font-bold px-6 py-3 rounded-xl shadow-md hover:bg-emerald-50 active:scale-95 transition flex items-center gap-2 text-sm sm:text-base">
+            <button onclick="filterCategory('All'); navigate('products');" class="bg-white text-emerald-800 font-bold px-6 py-3 rounded-xl shadow-md hover:bg-emerald-50 active:scale-95 transition flex items-center gap-2 text-sm sm:text-base">
               <span>Shop All Items</span>
               <i class="fa-solid fa-arrow-right text-xs"></i>
             </button>
@@ -299,7 +299,7 @@
             </div>
           </div>
 
-          <form id="checkout-order-form" onsubmit="submitCheckoutOrder(event)" class="space-y-4">
+          <form id="checkout-order-form" onsubmit="submitCheckoutOrder(event)" novalidate class="space-y-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Customer Name</label>
@@ -314,6 +314,7 @@
             <div>
               <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Contact Phone Number *</label>
               <input type="tel" id="cust-phone-input" inputmode="tel" autocomplete="tel" required class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition" placeholder="+1 (555) 000-0000" />
+              <p id="phone-error" class="hidden text-xs text-red-600 font-semibold mt-1"></p>
             </div>
 
             <div>
@@ -327,26 +328,37 @@
             <div id="business-name-group" class="hidden">
               <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Business / Store Name *</label>
               <input type="text" id="cust-business-name-input" class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition" placeholder="Acme Store / Business LLC" />
+              <p id="business-error" class="hidden text-xs text-red-600 font-semibold mt-1"></p>
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Street Address / Unit *</label>
-              <input type="text" id="cust-street-input" autocomplete="street-address" required class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition" placeholder="123 Market Street, Apt 4B" />
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider">Street Address / Unit *</label>
+                <div id="address-verified-badge" class="hidden items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full">
+                  <i class="fa-solid fa-circle-check text-emerald-600 text-xs"></i>
+                  <span>Verified with Google Maps</span>
+                </div>
+              </div>
+              <input type="text" id="cust-street-input" autocomplete="street-address" required class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition" placeholder="Start typing address or 123 Market Street, Apt 4B" />
+              <p id="street-error" class="hidden text-xs text-red-600 font-semibold mt-1"></p>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div class="sm:col-span-1">
                 <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">City *</label>
                 <input type="text" id="cust-city-input" autocomplete="address-level2" required class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition" placeholder="City" />
+                <p id="city-error" class="hidden text-xs text-red-600 font-semibold mt-1"></p>
               </div>
               <div class="grid grid-cols-2 gap-3 sm:col-span-2">
                 <div>
                   <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">State *</label>
-                  <input type="text" id="cust-state-input" autocomplete="address-level1" required class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition" placeholder="State / Prov" />
+                  <input type="text" id="cust-state-input" autocomplete="address-level1" maxlength="30" required class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition uppercase" placeholder="CA" />
+                  <p id="state-error" class="hidden text-xs text-red-600 font-semibold mt-1"></p>
                 </div>
                 <div>
                   <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Zip Code *</label>
-                  <input type="text" id="cust-zip-input" inputmode="numeric" autocomplete="postal-code" required class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition" placeholder="Zip / Postal" />
+                  <input type="text" id="cust-zip-input" inputmode="numeric" maxlength="10" autocomplete="postal-code" required class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition" placeholder="94105" />
+                  <p id="zip-error" class="hidden text-xs text-red-600 font-semibold mt-1"></p>
                 </div>
               </div>
             </div>

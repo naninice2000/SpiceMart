@@ -12,6 +12,7 @@
     const ORDERS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxR3iwqfM0ya7XtBpUjQGFsjAEuSgge6h8Ea5PwDNB0992-y8r6ZcF2SPtdQpSTHBo9Tw/exec'; // Orders processing, Google Sheet storage, PDF invoice & email dispatch
     const CACHE_KEY = 'spicemart_products_v6';
     const TAX_RATE = 0.0825; // 8.25% Sales Tax
+    const GOOGLE_MAPS_API_KEY = 'AIzaSyDOq7G_nS3SfFjTHVdI_lrYTK1Jofzf4nE'; // Optional Google Maps Platform API Key (Places & Geocoding)
 
     // Default Fallback Products Inventory
     const DEFAULT_PRODUCTS = [
@@ -1053,6 +1054,9 @@
       if (dispEmail) dispEmail.innerText = currentUser.email;
       if (inputName) inputName.value = currentUser.name;
       if (inputEmail) inputEmail.value = currentUser.email;
+
+      initGoogleMapsPlaces();
+      attachAddressValidationListeners();
     }
 
     function renderCheckoutSummary() {
@@ -1093,6 +1097,277 @@
       if (totalEl) totalEl.innerText = `$${grandTotal.toFixed(2)}`;
     }
 
+    // ==========================================
+    // GOOGLE MAPS & ADDRESS VALIDATION SERVICES
+    // ==========================================
+    let placesAutocomplete = null;
+    let isGoogleAddressVerified = false;
+
+    function initGoogleMapsPlaces() {
+      if (typeof GOOGLE_MAPS_API_KEY !== 'undefined' && GOOGLE_MAPS_API_KEY && GOOGLE_MAPS_API_KEY.trim() !== '') {
+        if (window.google && window.google.maps && window.google.maps.places) {
+          setupPlacesAutocomplete();
+          return;
+        }
+        if (document.getElementById('google-maps-script')) return;
+        const script = document.createElement('script');
+        script.id = 'google-maps-script';
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(GOOGLE_MAPS_API_KEY.trim())}&libraries=places&loading=async&callback=setupPlacesAutocomplete`;
+        script.async = true;
+        script.defer = true;
+        window.setupPlacesAutocomplete = setupPlacesAutocomplete;
+        document.head.appendChild(script);
+      }
+    }
+
+    function setupPlacesAutocomplete() {
+      const streetInput = document.getElementById('cust-street-input');
+      if (!streetInput || !window.google || !window.google.maps || !window.google.maps.places) return;
+      try {
+        placesAutocomplete = new google.maps.places.Autocomplete(streetInput, {
+          types: ['address'],
+          fields: ['address_components', 'formatted_address']
+        });
+        placesAutocomplete.addListener('place_changed', onGooglePlaceSelected);
+      } catch (e) {
+        console.warn('Google Places init note:', e);
+      }
+    }
+
+    function onGooglePlaceSelected() {
+      if (!placesAutocomplete) return;
+      const place = placesAutocomplete.getPlace();
+      if (!place || !place.address_components) return;
+
+      let streetNum = '';
+      let route = '';
+      let city = '';
+      let state = '';
+      let zip = '';
+
+      place.address_components.forEach(comp => {
+        const types = comp.types || [];
+        if (types.includes('street_number')) streetNum = comp.long_name;
+        if (types.includes('route')) route = comp.long_name;
+        if (types.includes('locality')) city = comp.long_name;
+        if (!city && types.includes('sublocality')) city = comp.long_name;
+        if (types.includes('administrative_area_level_1')) state = comp.short_name || comp.long_name;
+        if (types.includes('postal_code')) zip = comp.long_name;
+      });
+
+      const fullStreet = [streetNum, route].filter(Boolean).join(' ');
+      const streetInput = document.getElementById('cust-street-input');
+      const cityInput = document.getElementById('cust-city-input');
+      const stateInput = document.getElementById('cust-state-input');
+      const zipInput = document.getElementById('cust-zip-input');
+
+      if (fullStreet && streetInput) streetInput.value = fullStreet;
+      if (city && cityInput) cityInput.value = city;
+      if (state && stateInput) stateInput.value = state.toUpperCase();
+      if (zip && zipInput) zipInput.value = zip;
+
+      isGoogleAddressVerified = true;
+      const badge = document.getElementById('address-verified-badge');
+      if (badge) {
+        badge.classList.remove('hidden');
+        badge.classList.add('inline-flex');
+      }
+      clearAllAddressErrors();
+    }
+
+    function setFieldError(fieldId, errorId, errorMsg) {
+      const field = document.getElementById(fieldId);
+      const errEl = document.getElementById(errorId);
+      if (field) {
+        field.classList.add('border-red-500', 'focus:ring-red-400');
+        field.classList.remove('border-gray-300', 'focus:ring-emerald-500');
+      }
+      if (errEl) {
+        errEl.innerText = errorMsg;
+        errEl.classList.remove('hidden');
+      }
+    }
+
+    function clearFieldError(fieldId, errorId) {
+      const field = document.getElementById(fieldId);
+      const errEl = document.getElementById(errorId);
+      if (field) {
+        field.classList.remove('border-red-500', 'focus:ring-red-400');
+        field.classList.add('border-gray-300', 'focus:ring-emerald-500');
+      }
+      if (errEl) {
+        errEl.innerText = '';
+        errEl.classList.add('hidden');
+      }
+    }
+
+    function clearAllAddressErrors() {
+      clearFieldError('cust-phone-input', 'phone-error');
+      clearFieldError('cust-business-name-input', 'business-error');
+      clearFieldError('cust-street-input', 'street-error');
+      clearFieldError('cust-city-input', 'city-error');
+      clearFieldError('cust-state-input', 'state-error');
+      clearFieldError('cust-zip-input', 'zip-error');
+    }
+
+    function validatePhone(phone) {
+      const cleaned = (phone || '').replace(/[\s\-\(\)\.]/g, '');
+      return /^(\+?1)?[0-9]{10,12}$/.test(cleaned);
+    }
+
+    function validateZip(zip) {
+      const cleaned = (zip || '').trim();
+      return /^\d{5}(-\d{4})?$/.test(cleaned);
+    }
+
+    function validateState(state) {
+      const cleaned = (state || '').trim();
+      return /^[a-zA-Z\s]{2,30}$/.test(cleaned);
+    }
+
+    function validateCity(city) {
+      const cleaned = (city || '').trim();
+      return /^[a-zA-Z\s\.\-]{2,50}$/.test(cleaned);
+    }
+
+    function validateStreet(street) {
+      const cleaned = (street || '').trim();
+      return cleaned.length >= 4 && (/\d/.test(cleaned) || cleaned.length >= 6);
+    }
+
+    function validateAddressForm() {
+      let isValid = true;
+      const phoneInput = document.getElementById('cust-phone-input');
+      const addrType = document.getElementById('cust-addr-type-input')?.value || 'Residential';
+      const bNameInput = document.getElementById('cust-business-name-input');
+      const streetInput = document.getElementById('cust-street-input');
+      const cityInput = document.getElementById('cust-city-input');
+      const stateInput = document.getElementById('cust-state-input');
+      const zipInput = document.getElementById('cust-zip-input');
+
+      const phone = phoneInput?.value.trim() || '';
+      const bName = bNameInput?.value.trim() || '';
+      const street = streetInput?.value.trim() || '';
+      const city = cityInput?.value.trim() || '';
+      const state = stateInput?.value.trim() || '';
+      const zip = zipInput?.value.trim() || '';
+
+      // 1. Phone validation
+      if (!phone) {
+        setFieldError('cust-phone-input', 'phone-error', 'Phone number is required.');
+        isValid = false;
+      } else if (!validatePhone(phone)) {
+        setFieldError('cust-phone-input', 'phone-error', 'Please enter a valid 10-digit phone number.');
+        isValid = false;
+      } else {
+        clearFieldError('cust-phone-input', 'phone-error');
+      }
+
+      // 2. Business name validation (if Commercial)
+      if (addrType === 'Commercial') {
+        if (!bName || bName.length < 2) {
+          setFieldError('cust-business-name-input', 'business-error', 'Business / Store name is required for commercial delivery.');
+          isValid = false;
+        } else {
+          clearFieldError('cust-business-name-input', 'business-error');
+        }
+      } else {
+        clearFieldError('cust-business-name-input', 'business-error');
+      }
+
+      // 3. Street validation
+      if (!street) {
+        setFieldError('cust-street-input', 'street-error', 'Street address is required.');
+        isValid = false;
+      } else if (!validateStreet(street)) {
+        setFieldError('cust-street-input', 'street-error', 'Please enter a valid street address (e.g. 123 Market St).');
+        isValid = false;
+      } else {
+        clearFieldError('cust-street-input', 'street-error');
+      }
+
+      // 4. City validation
+      if (!city) {
+        setFieldError('cust-city-input', 'city-error', 'City is required.');
+        isValid = false;
+      } else if (!validateCity(city)) {
+        setFieldError('cust-city-input', 'city-error', 'Please enter a valid city name.');
+        isValid = false;
+      } else {
+        clearFieldError('cust-city-input', 'city-error');
+      }
+
+      // 5. State validation
+      if (!state) {
+        setFieldError('cust-state-input', 'state-error', 'State is required.');
+        isValid = false;
+      } else if (!validateState(state)) {
+        setFieldError('cust-state-input', 'state-error', 'Please enter a valid 2-letter state code or name.');
+        isValid = false;
+      } else {
+        clearFieldError('cust-state-input', 'state-error');
+      }
+
+      // 6. Zip code validation
+      if (!zip) {
+        setFieldError('cust-zip-input', 'zip-error', 'ZIP code is required.');
+        isValid = false;
+      } else if (!validateZip(zip)) {
+        setFieldError('cust-zip-input', 'zip-error', 'Please enter a valid 5-digit US ZIP code.');
+        isValid = false;
+      } else {
+        clearFieldError('cust-zip-input', 'zip-error');
+      }
+
+      return isValid;
+    }
+
+    function attachAddressValidationListeners() {
+      const phone = document.getElementById('cust-phone-input');
+      const bName = document.getElementById('cust-business-name-input');
+      const street = document.getElementById('cust-street-input');
+      const city = document.getElementById('cust-city-input');
+      const state = document.getElementById('cust-state-input');
+      const zip = document.getElementById('cust-zip-input');
+
+      if (phone && !phone.dataset.listener) {
+        phone.dataset.listener = 'true';
+        phone.addEventListener('input', () => {
+          if (validatePhone(phone.value)) clearFieldError('cust-phone-input', 'phone-error');
+        });
+      }
+      if (bName && !bName.dataset.listener) {
+        bName.dataset.listener = 'true';
+        bName.addEventListener('input', () => {
+          if (bName.value.trim().length >= 2) clearFieldError('cust-business-name-input', 'business-error');
+        });
+      }
+      if (street && !street.dataset.listener) {
+        street.dataset.listener = 'true';
+        street.addEventListener('input', () => {
+          if (validateStreet(street.value)) clearFieldError('cust-street-input', 'street-error');
+        });
+      }
+      if (city && !city.dataset.listener) {
+        city.dataset.listener = 'true';
+        city.addEventListener('input', () => {
+          if (validateCity(city.value)) clearFieldError('cust-city-input', 'city-error');
+        });
+      }
+      if (state && !state.dataset.listener) {
+        state.dataset.listener = 'true';
+        state.addEventListener('input', () => {
+          if (validateState(state.value)) clearFieldError('cust-state-input', 'state-error');
+        });
+      }
+      if (zip && !zip.dataset.listener) {
+        zip.dataset.listener = 'true';
+        zip.addEventListener('input', () => {
+          if (validateZip(zip.value)) clearFieldError('cust-zip-input', 'zip-error');
+        });
+      }
+    }
+
     function handleAddressTypeChange() {
       const type = document.getElementById('cust-addr-type-input').value;
       const bGroup = document.getElementById('business-name-group');
@@ -1103,6 +1378,7 @@
       } else {
         bGroup.classList.add('hidden');
         bInput.required = false;
+        clearFieldError('cust-business-name-input', 'business-error');
       }
     }
 
@@ -1117,6 +1393,10 @@
 
       if (cart.length === 0) {
         alert('Cart is empty.');
+        return;
+      }
+
+      if (!validateAddressForm()) {
         return;
       }
 
@@ -1221,4 +1501,8 @@
       navigate('home');
     }
 
-    window.onload = init;
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
