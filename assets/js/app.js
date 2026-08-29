@@ -8,7 +8,7 @@
     const STORE_NAME = 'SpiceMart'; // <<< Change Store Name in this ONE single place!
     const STORE_TAGLINE = 'Indian & Mexican Groceries';
     const GOOGLE_CLIENT_ID = '460683061183-9el98nqfh0djo2qc215lcmb140ini306.apps.googleusercontent.com';
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpIlXam2h512fMHLeNY-_7AX_5ixidHIOBd_ND_RzerHVjONtBKMIJTWb-QZuHtNNm/exec'; // Products catalog & search
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzneULs0vFdvv1kMutfck8_i03B6lJ8EZdG9_ICIfFsyKNbO4kkSaZKfx9azOtTjKR6/exec'; // Products catalog & search
     const ORDERS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxshnK3l1cRswHFR65M75Y6wNE_hzMj9dSPoLRdPJVd99M85iKSewA_QTN_4eV-1n4jrA/exec'; // Orders processing, Google Sheet storage, PDF invoice & email dispatch
     const CUSTOMERS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyjiEWsmjPNMkn6XbMDZ76tsfBQN2L_gwZJjUwUqqEObwPvtoF3tmAlNV7RhTRWMMoIbw/exec'; // CustomerManagement (Profiles & Addresses)
     const CACHE_KEY = 'spicemart_products_v6';
@@ -497,7 +497,11 @@
           const freshData = await res.json();
           if (Array.isArray(freshData) && freshData.length > 0) {
             allProducts = freshData.map(normalizeProduct).filter(Boolean);
-            localStorage.setItem(CACHE_KEY, JSON.stringify(allProducts));
+            try {
+              localStorage.setItem(CACHE_KEY, JSON.stringify(allProducts.slice(0, 300)));
+            } catch (e) {
+              console.warn('LocalStorage quota note:', e);
+            }
             renderCategories();
             renderProducts();
             renderCart();
@@ -561,37 +565,54 @@
       const categories = ['All', ...new Set(allProducts.map(p => p.category).filter(Boolean))];
       
       const tabs = document.getElementById('category-tabs');
-      tabs.innerHTML = categories.map(cat => {
-        const isActive = selectedCategory === cat;
-        return `
-          <button onclick="filterCategory('${cat}')" 
-            class="cat-pill whitespace-nowrap px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition active:scale-95 flex-shrink-0 cursor-pointer ${
-              isActive ? 'bg-emerald-600 text-white shadow-xs' : 'bg-gray-200/90 text-gray-700 hover:bg-emerald-50 hover:text-emerald-700'
-            }">
-            ${cat === 'All' ? 'All Products' : cat}
-          </button>
-        `;
-      }).join('');
+      if (tabs) {
+        tabs.innerHTML = categories.map(cat => {
+          const isActive = selectedCategory === cat;
+          return `
+            <button onclick="filterCategory('${cat}')" 
+              class="cat-pill whitespace-nowrap px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition active:scale-95 flex-shrink-0 cursor-pointer ${
+                isActive ? 'bg-emerald-600 text-white shadow-xs' : 'bg-gray-200/90 text-gray-700 hover:bg-emerald-50 hover:text-emerald-700'
+              }">
+              ${cat === 'All' ? 'All Products' : cat}
+            </button>
+          `;
+        }).join('');
+      }
 
       const homeCats = document.getElementById('home-categories-grid');
-      const iconMap = {
-        'Rice & Grains': 'fa-bowl-rice',
-        'Spices': 'fa-pepper-hot',
-        'Herbs & Leaves': 'fa-seedling',
-        'Groceries': 'fa-basket-shopping'
-      };
+      if (homeCats) {
+        const iconMap = {
+          'Spices & Whole Seeds': 'fa-pepper-hot',
+          'Ground Spices & Masala Blends': 'fa-mortar-pestle',
+          'Rice, Grains & Flours': 'fa-bowl-rice',
+          'Rice & Grains': 'fa-bowl-rice',
+          'Grains & Rice': 'fa-bowl-rice',
+          'Lentils, Dals & Pulses': 'fa-bowl-food',
+          'Lentils & Pulses': 'fa-bowl-food',
+          'Cooking Oils, Ghee & Pastes': 'fa-bottle-droplet',
+          'Pickles, Chutneys & Sauces': 'fa-jar',
+          'Snacks, Namkeen & Bakery': 'fa-cookie-bite',
+          'Sweets, Desserts & Confectionery': 'fa-candy-cane',
+          'Middle Eastern Specialties': 'fa-globe-americas',
+          'Mexican & Latin Specialties': 'fa-pepper-hot',
+          'Beverages, Teas & Coffees': 'fa-mug-hot',
+          'Dairy, Frozen Foods & Ready to Eat': 'fa-snowflake',
+          'Herbs & Leaves': 'fa-seedling',
+          'Groceries': 'fa-basket-shopping'
+        };
 
-      homeCats.innerHTML = categories.filter(c => c !== 'All').map(cat => {
-        const icon = iconMap[cat] || 'fa-basket-shopping';
-        return `
-          <div onclick="selectAndNavigateCategory('${cat}')" class="bg-white border border-gray-200/90 rounded-2xl p-4 sm:p-5 text-center cursor-pointer shadow-xs active:scale-98 hover:shadow-md hover:border-emerald-400 transition group flex flex-col items-center justify-center">
-            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-2.5 sm:mb-3 text-xl group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition duration-200">
-              <i class="fa-solid ${icon}"></i>
+        homeCats.innerHTML = categories.filter(c => c !== 'All').map(cat => {
+          const icon = iconMap[cat] || 'fa-basket-shopping';
+          return `
+            <div onclick="selectAndNavigateCategory('${cat}')" class="bg-white border border-gray-200/90 rounded-2xl p-4 sm:p-5 text-center cursor-pointer shadow-xs active:scale-98 hover:shadow-md hover:border-emerald-400 transition group flex flex-col items-center justify-center">
+              <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-2.5 sm:mb-3 text-xl group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition duration-200">
+                <i class="fa-solid ${icon}"></i>
+              </div>
+              <h4 class="font-bold text-xs sm:text-sm text-gray-800 group-hover:text-emerald-700 transition">${cat}</h4>
             </div>
-            <h4 class="font-bold text-xs sm:text-sm text-gray-800 group-hover:text-emerald-700 transition">${cat}</h4>
-          </div>
-        `;
-      }).join('');
+          `;
+        }).join('');
+      }
     }
 
     // Search Engine
@@ -774,12 +795,20 @@
       navigate('products');
     }
 
+    let displayedProductLimit = 48;
+
     function filterCategory(cat) {
       if (searchQuery) {
         clearSearch();
       }
       selectedCategory = cat;
+      displayedProductLimit = 48;
       renderCategories();
+      renderProducts();
+    }
+
+    function loadMoreProducts() {
+      displayedProductLimit += 48;
       renderProducts();
     }
 
@@ -798,8 +827,17 @@
       const emptyTitle = document.getElementById('empty-title');
       const emptyDesc = document.getElementById('empty-desc');
 
+      let loadMoreContainer = document.getElementById('load-more-container');
+      if (!loadMoreContainer && grid) {
+        loadMoreContainer = document.createElement('div');
+        loadMoreContainer.id = 'load-more-container';
+        loadMoreContainer.className = 'w-full py-8 text-center';
+        grid.parentNode.appendChild(loadMoreContainer);
+      }
+
       if (!productsList || productsList.length === 0) {
         grid.innerHTML = '';
+        if (loadMoreContainer) loadMoreContainer.classList.add('hidden');
         if (emptyTitle) emptyTitle.innerText = 'No matches found';
         if (emptyDesc) emptyDesc.innerText = customEmptyMsg || `We couldn't find any products matching this selection.`;
         empty.classList.remove('hidden');
@@ -807,7 +845,8 @@
       }
 
       empty.classList.add('hidden');
-      grid.innerHTML = productsList.map(prod => {
+      const visibleProducts = productsList.slice(0, displayedProductLimit);
+      grid.innerHTML = visibleProducts.map(prod => {
         const safeId = String(prod.id);
         const qty = localQtyState[safeId] || 1;
         const safeImgSrc = prod.image_url ? encodeURI(prod.image_url) : '';
@@ -858,6 +897,20 @@
           </div>
         `;
       }).join('');
+
+      if (loadMoreContainer) {
+        if (productsList.length > displayedProductLimit) {
+          loadMoreContainer.innerHTML = `
+            <button onclick="loadMoreProducts()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold px-8 py-3.5 rounded-2xl border border-emerald-300 shadow-xs active:scale-95 transition text-xs sm:text-sm inline-flex items-center gap-2">
+              <i class="fa-solid fa-arrows-rotate"></i>
+              <span>Load More Products (Showing ${visibleProducts.length} of ${productsList.length.toLocaleString()})</span>
+            </button>
+          `;
+          loadMoreContainer.classList.remove('hidden');
+        } else {
+          loadMoreContainer.classList.add('hidden');
+        }
+      }
     }
 
     function updateLocalQty(prodId, delta) {
