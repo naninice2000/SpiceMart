@@ -10,6 +10,7 @@
   <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer onload="window.initGoogleAuth && window.initGoogleAuth()"></script>
   
+  <link rel="icon" type="image/png" href="assets/images/FavIcon.png" />
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
@@ -21,10 +22,8 @@
       <div class="flex justify-between items-center gap-3">
         
         <!-- Brand Logo -->
-        <div class="flex items-center gap-2 cursor-pointer select-none flex-shrink-0" onclick="navigate('home')">
-          <div class="w-9 h-9 bg-emerald-600 text-white rounded-xl flex items-center justify-center text-lg shadow-sm">
-            <i class="fa-solid fa-leaf"></i>
-          </div>
+        <div class="flex items-center gap-2.5 cursor-pointer select-none flex-shrink-0" onclick="navigate('home')">
+          <img src="assets/images/SpiceMartLogo.png" alt="SpiceMart Logo" class="h-9 sm:h-10 w-auto object-contain rounded-lg shadow-xs" />
           <span class="store-name-text text-xl sm:text-2xl font-black tracking-tight text-emerald-600">SpiceMart</span>
         </div>
 
@@ -412,7 +411,7 @@
     <!-- Store Footer -->
     <footer class="mt-12 py-6 border-t border-gray-200 text-center text-xs text-gray-500">
       <div class="flex items-center justify-center gap-2 mb-2 font-bold text-gray-700">
-        <i class="fa-solid fa-leaf text-emerald-600"></i>
+        <img src="assets/images/SpiceMartLogo.png" alt="SpiceMart Logo" class="h-6 w-auto object-contain inline-block rounded" />
         <span class="store-name-text text-sm font-black text-gray-800">SpiceMart</span>
       </div>
       <p>© 2026 <span class="store-name-text">SpiceMart</span>. All rights reserved. • Fast Delivery & Quality Guaranteed</p>
