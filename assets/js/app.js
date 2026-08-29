@@ -9,7 +9,7 @@
     const STORE_TAGLINE = 'Indian & Mexican Groceries';
     const GOOGLE_CLIENT_ID = '460683061183-9el98nqfh0djo2qc215lcmb140ini306.apps.googleusercontent.com';
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpIlXam2h512fMHLeNY-_7AX_5ixidHIOBd_ND_RzerHVjONtBKMIJTWb-QZuHtNNm/exec'; // Products catalog & search
-    const ORDERS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxR3iwqfM0ya7XtBpUjQGFsjAEuSgge6h8Ea5PwDNB0992-y8r6ZcF2SPtdQpSTHBo9Tw/exec'; // Orders processing, Google Sheet storage, PDF invoice & email dispatch
+    const ORDERS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxshnK3l1cRswHFR65M75Y6wNE_hzMj9dSPoLRdPJVd99M85iKSewA_QTN_4eV-1n4jrA/exec'; // Orders processing, Google Sheet storage, PDF invoice & email dispatch
     const CUSTOMERS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyjiEWsmjPNMkn6XbMDZ76tsfBQN2L_gwZJjUwUqqEObwPvtoF3tmAlNV7RhTRWMMoIbw/exec'; // CustomerManagement (Profiles & Addresses)
     const CACHE_KEY = 'spicemart_products_v6';
     const TAX_RATE = 0.0825; // 8.25% Sales Tax
