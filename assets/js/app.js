@@ -10,7 +10,7 @@
     const GOOGLE_CLIENT_ID = '460683061183-9el98nqfh0djo2qc215lcmb140ini306.apps.googleusercontent.com';
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpIlXam2h512fMHLeNY-_7AX_5ixidHIOBd_ND_RzerHVjONtBKMIJTWb-QZuHtNNm/exec'; // Products catalog & search
     const ORDERS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxR3iwqfM0ya7XtBpUjQGFsjAEuSgge6h8Ea5PwDNB0992-y8r6ZcF2SPtdQpSTHBo9Tw/exec'; // Orders processing, Google Sheet storage, PDF invoice & email dispatch
-    const CUSTOMERS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4PRY6G_MN0wtNg5_Hgwzp3XyYFoO_sr0Jf6WSCk2qMZQeP7kKe8i05dVkQn_7pjE4NQ/exec'; // CustomerManagement (Profiles & Addresses)
+    const CUSTOMERS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyjiEWsmjPNMkn6XbMDZ76tsfBQN2L_gwZJjUwUqqEObwPvtoF3tmAlNV7RhTRWMMoIbw/exec'; // CustomerManagement (Profiles & Addresses)
     const CACHE_KEY = 'spicemart_products_v6';
     const TAX_RATE = 0.0825; // 8.25% Sales Tax
     const GOOGLE_MAPS_API_KEY = 'AIzaSyDOq7G_nS3SfFjTHVdI_lrYTK1Jofzf4nE'; // Optional Google Maps Platform API Key (Places & Geocoding)
