@@ -15,6 +15,7 @@ color gray_500
 color gray_800
 color gray_900
 color white
+drawable app_logo
 drawable ic_launcher_background
 drawable ic_launcher_foreground
 drawable ic_wifi_off
