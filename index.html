@@ -4,11 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
   <meta name="theme-color" content="#059669" />
-  <title>SpiceMart Store</title>
+  <title>SpiceMart - Indian & Mexican Groceries</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer onload="window.initGoogleAuth && window.initGoogleAuth()"></script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
   
   <link rel="icon" type="image/png" href="assets/images/FavIcon.png" />
   <link rel="manifest" href="manifest.json" />
@@ -24,7 +28,9 @@
         <!-- Brand Logo -->
         <div class="flex items-center gap-2.5 cursor-pointer select-none flex-shrink-0" onclick="navigate('home')">
           <img src="assets/images/SpiceMartLogo.png" alt="SpiceMart Logo" class="h-9 sm:h-10 w-auto object-contain rounded-lg shadow-xs" />
-          <span class="store-name-text text-xl sm:text-2xl font-black tracking-tight text-emerald-600">SpiceMart</span>
+          <span class="store-name-text text-2xl sm:text-3xl font-black tracking-tight" style="font-family: 'Playfair Display', Georgia, serif;">
+            <span class="text-[#b91c1c]">Spice</span><span class="text-[#15803d]">Mart</span>
+          </span>
         </div>
 
         <!-- Desktop Search Bar -->
@@ -143,28 +149,28 @@
     <!-- 1. HOME PAGE -->
     <section id="page-home" class="py-4 sm:py-8">
       <!-- Hero Banner -->
-      <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 text-white p-6 sm:p-12 mb-8 shadow-lg">
-        <div class="relative z-10 max-w-xl">
-          <div class="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase mb-3">
-            <i class="fa-solid fa-sparkles text-amber-300"></i> Fresh & Organic Spices
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1a3a2a] via-[#14532d] to-[#0f2e1d] text-white p-6 sm:p-12 mb-8 shadow-2xl border border-emerald-800/40">
+        <div class="relative z-10 max-w-2xl">
+          <div class="inline-flex items-center gap-2 bg-black/30 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-black tracking-widest uppercase mb-4 border border-emerald-500/30 text-amber-300 shadow-xs">
+            <span>•</span><span>Indian & Mexican Groceries</span><span>•</span>
           </div>
-          <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight mb-3">
-            Pure Spices & Daily Groceries Delivered Fast
+          <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight mb-4 drop-shadow-md" style="font-family: 'Playfair Display', Georgia, serif;">
+            <span class="text-[#ef4444] drop-shadow-sm">Spice</span><span class="text-[#4ade80] drop-shadow-sm">Mart</span>
           </h1>
-          <p class="text-emerald-100 text-sm sm:text-base leading-relaxed mb-6">
-            Handpicked premium rice, organic whole spices, and authentic pantry essentials directly to your doorstep.
+          <p class="text-emerald-100/90 text-sm sm:text-lg leading-relaxed mb-6 font-medium max-w-lg">
+            Authentic Indian spices, premium aged basmati rice, Mexican specialty essentials, and daily fresh groceries delivered fast to your doorstep.
           </p>
           <div class="flex flex-wrap gap-3">
-            <button onclick="filterCategory('All'); navigate('products');" class="bg-white text-emerald-800 font-bold px-6 py-3 rounded-xl shadow-md hover:bg-emerald-50 active:scale-95 transition flex items-center gap-2 text-sm sm:text-base">
+            <button onclick="filterCategory('All'); navigate('products');" class="bg-white text-emerald-900 font-extrabold px-6 py-3.5 rounded-xl shadow-lg hover:bg-emerald-50 active:scale-95 transition flex items-center gap-2 text-sm sm:text-base cursor-pointer">
               <span>Shop All Items</span>
               <i class="fa-solid fa-arrow-right text-xs"></i>
             </button>
-            <button onclick="filterCategory('Spices'); navigate('products');" class="bg-emerald-800/60 backdrop-blur border border-white/20 text-white font-semibold px-5 py-3 rounded-xl hover:bg-emerald-800 active:scale-95 transition text-sm sm:text-base">
+            <button onclick="filterCategory('Spices'); navigate('products');" class="bg-emerald-950/60 backdrop-blur border border-emerald-400/30 text-white font-bold px-5 py-3.5 rounded-xl hover:bg-emerald-900 active:scale-95 transition text-sm sm:text-base cursor-pointer">
               Explore Spices
             </button>
           </div>
         </div>
-        <div class="absolute -bottom-8 -right-8 text-white/10 text-9xl pointer-events-none sm:text-[14rem]">
+        <div class="absolute -bottom-8 -right-8 text-white/10 text-9xl pointer-events-none sm:text-[15rem]">
           <i class="fa-solid fa-pepper-hot"></i>
         </div>
       </div>
@@ -321,54 +327,105 @@
               </div>
             </div>
 
+            <!-- Fulfillment Option Selector -->
+            <div>
+              <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Fulfillment Option *</label>
+              <div class="grid grid-cols-2 gap-3">
+                <label id="fulfillment-delivery-label" class="flex items-center justify-center gap-2 p-3 sm:p-3.5 rounded-xl border-2 border-emerald-600 bg-emerald-50/70 text-emerald-900 font-bold text-sm cursor-pointer transition select-none shadow-xs">
+                  <input type="radio" name="fulfillment_option" value="Delivery" checked onchange="handleFulfillmentChange()" class="hidden" />
+                  <i class="fa-solid fa-truck-fast text-emerald-600 text-base"></i>
+                  <span>Home Delivery</span>
+                </label>
+                <label id="fulfillment-pickup-label" class="flex items-center justify-center gap-2 p-3 sm:p-3.5 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-semibold text-sm cursor-pointer hover:bg-gray-50 transition select-none">
+                  <input type="radio" name="fulfillment_option" value="Pickup" onchange="handleFulfillmentChange()" class="hidden" />
+                  <i class="fa-solid fa-store text-gray-500 text-base"></i>
+                  <span>Store Pickup</span>
+                </label>
+              </div>
+            </div>
+
             <div>
               <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Contact Phone Number *</label>
               <input type="tel" id="cust-phone-input" inputmode="tel" autocomplete="tel" required class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition" placeholder="+1 (555) 000-0000" />
               <p id="phone-error" class="hidden text-xs text-red-600 font-semibold mt-1"></p>
             </div>
 
-            <div>
-              <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Address Type *</label>
-              <select id="cust-addr-type-input" onchange="handleAddressTypeChange()" class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm bg-white focus:ring-2 focus:ring-emerald-500 outline-none transition">
-                <option value="Residential">Residential Delivery Address</option>
-                <option value="Commercial">Business / Commercial Address</option>
-              </select>
-            </div>
+            <!-- Conditional Section 1: Home Delivery Address -->
+            <div id="delivery-address-container" class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Address Type *</label>
+                <select id="cust-addr-type-input" onchange="handleAddressTypeChange()" class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm bg-white focus:ring-2 focus:ring-emerald-500 outline-none transition">
+                  <option value="Residential">Residential Delivery Address</option>
+                  <option value="Commercial">Business / Commercial Address</option>
+                </select>
+              </div>
 
-            <div id="business-name-group" class="hidden">
-              <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Business / Store Name *</label>
-              <input type="text" id="cust-business-name-input" class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition" placeholder="Acme Store / Business LLC" />
-              <p id="business-error" class="hidden text-xs text-red-600 font-semibold mt-1"></p>
-            </div>
+              <div id="business-name-group" class="hidden">
+                <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Business / Store Name *</label>
+                <input type="text" id="cust-business-name-input" class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition" placeholder="Acme Store / Business LLC" />
+                <p id="business-error" class="hidden text-xs text-red-600 font-semibold mt-1"></p>
+              </div>
 
-            <div>
-              <div class="flex items-center justify-between mb-1">
-                <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider">Street Address / Unit *</label>
-                <div id="address-verified-badge" class="hidden items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full">
-                  <i class="fa-solid fa-circle-check text-emerald-600 text-xs"></i>
-                  <span>Verified with Google Maps</span>
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider">Street Address / Unit *</label>
+                  <div id="address-verified-badge" class="hidden items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full">
+                    <i class="fa-solid fa-circle-check text-emerald-600 text-xs"></i>
+                    <span>Verified with Google Maps</span>
+                  </div>
+                </div>
+                <input type="text" id="cust-street-input" autocomplete="street-address" required class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition" placeholder="Start typing address or 123 Market Street, Apt 4B" />
+                <p id="street-error" class="hidden text-xs text-red-600 font-semibold mt-1"></p>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="sm:col-span-1">
+                  <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">City *</label>
+                  <input type="text" id="cust-city-input" autocomplete="address-level2" required class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition" placeholder="City" />
+                  <p id="city-error" class="hidden text-xs text-red-600 font-semibold mt-1"></p>
+                </div>
+                <div class="grid grid-cols-2 gap-3 sm:col-span-2">
+                  <div>
+                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">State *</label>
+                    <input type="text" id="cust-state-input" autocomplete="address-level1" maxlength="30" required class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition uppercase" placeholder="CA" />
+                    <p id="state-error" class="hidden text-xs text-red-600 font-semibold mt-1"></p>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Zip Code *</label>
+                    <input type="text" id="cust-zip-input" inputmode="numeric" maxlength="10" autocomplete="postal-code" required class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition" placeholder="94105" />
+                    <p id="zip-error" class="hidden text-xs text-red-600 font-semibold mt-1"></p>
+                  </div>
                 </div>
               </div>
-              <input type="text" id="cust-street-input" autocomplete="street-address" required class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition" placeholder="Start typing address or 123 Market Street, Apt 4B" />
-              <p id="street-error" class="hidden text-xs text-red-600 font-semibold mt-1"></p>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div class="sm:col-span-1">
-                <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">City *</label>
-                <input type="text" id="cust-city-input" autocomplete="address-level2" required class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition" placeholder="City" />
-                <p id="city-error" class="hidden text-xs text-red-600 font-semibold mt-1"></p>
+            <!-- Conditional Section 2: Store Pickup Scheduling -->
+            <div id="pickup-schedule-container" class="hidden space-y-4 pt-1">
+              <div class="p-3.5 bg-emerald-50/80 border border-emerald-200 rounded-xl text-xs text-emerald-900 flex items-start gap-2.5">
+                <i class="fa-solid fa-store text-emerald-700 text-sm mt-0.5 flex-shrink-0"></i>
+                <div class="leading-relaxed">
+                  <strong>Store Pickup Policy:</strong> Store is closed on Sundays for in-store pickup.<br>
+                  <span class="text-emerald-800">You can place orders anytime, but <strong>pickup days are Monday through Saturday (10:00 AM – 3:00 PM)</strong>. Minimum 24 hours advance scheduling required.</span>
+                </div>
               </div>
-              <div class="grid grid-cols-2 gap-3 sm:col-span-2">
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">State *</label>
-                  <input type="text" id="cust-state-input" autocomplete="address-level1" maxlength="30" required class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition uppercase" placeholder="CA" />
-                  <p id="state-error" class="hidden text-xs text-red-600 font-semibold mt-1"></p>
+                  <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Pickup Date (Min 24h Ahead, Mon–Sat) *</label>
+                  <input type="date" id="cust-pickup-date-input" onchange="validatePickupDate()" class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm bg-white focus:ring-2 focus:ring-emerald-500 outline-none transition" />
+                  <p id="pickup-date-error" class="hidden text-xs text-red-600 font-semibold mt-1"></p>
                 </div>
                 <div>
-                  <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Zip Code *</label>
-                  <input type="text" id="cust-zip-input" inputmode="numeric" maxlength="10" autocomplete="postal-code" required class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none transition" placeholder="94105" />
-                  <p id="zip-error" class="hidden text-xs text-red-600 font-semibold mt-1"></p>
+                  <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">Hourly Pickup Window (10 AM – 3 PM) *</label>
+                  <select id="cust-pickup-time-input" onchange="validatePickupTime()" class="w-full border border-gray-300 rounded-xl p-3 sm:p-2.5 text-base sm:text-sm bg-white focus:ring-2 focus:ring-emerald-500 outline-none transition">
+                    <option value="">Select a time slot</option>
+                    <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM</option>
+                    <option value="11:00 AM - 12:00 PM">11:00 AM - 12:00 PM</option>
+                    <option value="12:00 PM - 1:00 PM">12:00 PM - 1:00 PM</option>
+                    <option value="1:00 PM - 2:00 PM">1:00 PM - 2:00 PM</option>
+                    <option value="2:00 PM - 3:00 PM">2:00 PM - 3:00 PM</option>
+                  </select>
+                  <p id="pickup-time-error" class="hidden text-xs text-red-600 font-semibold mt-1"></p>
                 </div>
               </div>
             </div>

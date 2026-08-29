@@ -6,7 +6,7 @@
     // STORE CONFIGURATION KEYS
     // ==========================================
     const STORE_NAME = 'SpiceMart'; // <<< Change Store Name in this ONE single place!
-    const STORE_TAGLINE = 'Pure Spices & Daily Groceries';
+    const STORE_TAGLINE = 'Indian & Mexican Groceries';
     const GOOGLE_CLIENT_ID = '460683061183-9el98nqfh0djo2qc215lcmb140ini306.apps.googleusercontent.com';
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpIlXam2h512fMHLeNY-_7AX_5ixidHIOBd_ND_RzerHVjONtBKMIJTWb-QZuHtNNm/exec'; // Products catalog & search
     const ORDERS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxR3iwqfM0ya7XtBpUjQGFsjAEuSgge6h8Ea5PwDNB0992-y8r6ZcF2SPtdQpSTHBo9Tw/exec'; // Orders processing, Google Sheet storage, PDF invoice & email dispatch
@@ -453,11 +453,13 @@
     // Brand & Store Configuration Manager
     function applyStoreBranding() {
       // 1. Update Browser Tab Title
-      document.title = `${STORE_NAME} Store`;
+      document.title = `${STORE_NAME} - Indian & Mexican Groceries`;
       
-      // 2. Update all elements displaying Store Name
+      // 2. Update plain text elements displaying Store Name
       document.querySelectorAll('.store-name-text').forEach(el => {
-        el.innerText = STORE_NAME;
+        if (!el.children.length) {
+          el.innerText = STORE_NAME;
+        }
       });
 
       // 3. Update any elements displaying Store Tagline
@@ -1212,6 +1214,8 @@
 
       initGoogleMapsPlaces();
       attachAddressValidationListeners();
+      initPickupDateConstraints();
+      handleFulfillmentChange();
     }
 
     function renderCheckoutSummary() {
@@ -1363,6 +1367,8 @@
       clearFieldError('cust-city-input', 'city-error');
       clearFieldError('cust-state-input', 'state-error');
       clearFieldError('cust-zip-input', 'zip-error');
+      clearFieldError('cust-pickup-date-input', 'pickup-date-error');
+      clearFieldError('cust-pickup-time-input', 'pickup-time-error');
     }
 
     function validatePhone(phone) {
@@ -1393,21 +1399,12 @@
     function validateAddressForm() {
       let isValid = true;
       const phoneInput = document.getElementById('cust-phone-input');
-      const addrType = document.getElementById('cust-addr-type-input')?.value || 'Residential';
-      const bNameInput = document.getElementById('cust-business-name-input');
-      const streetInput = document.getElementById('cust-street-input');
-      const cityInput = document.getElementById('cust-city-input');
-      const stateInput = document.getElementById('cust-state-input');
-      const zipInput = document.getElementById('cust-zip-input');
+      const fulfillmentInput = document.querySelector('input[name="fulfillment_option"]:checked');
+      const fulfillment = fulfillmentInput ? fulfillmentInput.value : 'Delivery';
 
       const phone = phoneInput?.value.trim() || '';
-      const bName = bNameInput?.value.trim() || '';
-      const street = streetInput?.value.trim() || '';
-      const city = cityInput?.value.trim() || '';
-      const state = stateInput?.value.trim() || '';
-      const zip = zipInput?.value.trim() || '';
 
-      // 1. Phone validation
+      // 1. Phone validation (always required for order status / pickup notification)
       if (!phone) {
         setFieldError('cust-phone-input', 'phone-error', 'Phone number is required.');
         isValid = false;
@@ -1418,7 +1415,29 @@
         clearFieldError('cust-phone-input', 'phone-error');
       }
 
-      // 2. Business name validation (if Commercial)
+      // 2. If Store Pickup is selected, validate pickup date and time window
+      if (fulfillment === 'Pickup') {
+        const isDateValid = validatePickupDate();
+        const isTimeValid = validatePickupTime();
+        if (!isDateValid || !isTimeValid) isValid = false;
+        return isValid;
+      }
+
+      // 3. If Delivery is selected, validate full physical address
+      const addrType = document.getElementById('cust-addr-type-input')?.value || 'Residential';
+      const bNameInput = document.getElementById('cust-business-name-input');
+      const streetInput = document.getElementById('cust-street-input');
+      const cityInput = document.getElementById('cust-city-input');
+      const stateInput = document.getElementById('cust-state-input');
+      const zipInput = document.getElementById('cust-zip-input');
+
+      const bName = bNameInput?.value.trim() || '';
+      const street = streetInput?.value.trim() || '';
+      const city = cityInput?.value.trim() || '';
+      const state = stateInput?.value.trim() || '';
+      const zip = zipInput?.value.trim() || '';
+
+      // Business name validation (if Commercial)
       if (addrType === 'Commercial') {
         if (!bName || bName.length < 2) {
           setFieldError('cust-business-name-input', 'business-error', 'Business / Store name is required for commercial delivery.');
@@ -1430,7 +1449,7 @@
         clearFieldError('cust-business-name-input', 'business-error');
       }
 
-      // 3. Street validation
+      // Street validation
       if (!street) {
         setFieldError('cust-street-input', 'street-error', 'Street address is required.');
         isValid = false;
@@ -1441,7 +1460,7 @@
         clearFieldError('cust-street-input', 'street-error');
       }
 
-      // 4. City validation
+      // City validation
       if (!city) {
         setFieldError('cust-city-input', 'city-error', 'City is required.');
         isValid = false;
@@ -1452,7 +1471,7 @@
         clearFieldError('cust-city-input', 'city-error');
       }
 
-      // 5. State validation
+      // State validation
       if (!state) {
         setFieldError('cust-state-input', 'state-error', 'State is required.');
         isValid = false;
@@ -1463,7 +1482,7 @@
         clearFieldError('cust-state-input', 'state-error');
       }
 
-      // 6. Zip code validation
+      // Zip code validation
       if (!zip) {
         setFieldError('cust-zip-input', 'zip-error', 'ZIP code is required.');
         isValid = false;
@@ -1477,6 +1496,101 @@
       return isValid;
     }
 
+    function initPickupDateConstraints() {
+      const dateInput = document.getElementById('cust-pickup-date-input');
+      if (!dateInput) return;
+      
+      // Minimum pickup date is 24 hours in the future (tomorrow)
+      const minDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      const yyyy = minDate.getFullYear();
+      const mm = String(minDate.getMonth() + 1).padStart(2, '0');
+      const dd = String(minDate.getDate()).padStart(2, '0');
+      dateInput.min = `${yyyy}-${mm}-${dd}`;
+    }
+
+    function handleFulfillmentChange() {
+      const fulfillmentInput = document.querySelector('input[name="fulfillment_option"]:checked');
+      const fulfillment = fulfillmentInput ? fulfillmentInput.value : 'Delivery';
+      
+      const deliveryLabel = document.getElementById('fulfillment-delivery-label');
+      const pickupLabel = document.getElementById('fulfillment-pickup-label');
+      const deliveryContainer = document.getElementById('delivery-address-container');
+      const pickupContainer = document.getElementById('pickup-schedule-container');
+
+      if (fulfillment === 'Pickup') {
+        if (pickupLabel) {
+          pickupLabel.className = 'flex items-center justify-center gap-2 p-3 sm:p-3.5 rounded-xl border-2 border-emerald-600 bg-emerald-50/70 text-emerald-900 font-bold text-sm cursor-pointer transition select-none shadow-xs';
+        }
+        if (deliveryLabel) {
+          deliveryLabel.className = 'flex items-center justify-center gap-2 p-3 sm:p-3.5 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-semibold text-sm cursor-pointer hover:bg-gray-50 transition select-none';
+        }
+        if (deliveryContainer) deliveryContainer.classList.add('hidden');
+        if (pickupContainer) pickupContainer.classList.remove('hidden');
+        initPickupDateConstraints();
+        clearAllAddressErrors();
+      } else {
+        if (deliveryLabel) {
+          deliveryLabel.className = 'flex items-center justify-center gap-2 p-3 sm:p-3.5 rounded-xl border-2 border-emerald-600 bg-emerald-50/70 text-emerald-900 font-bold text-sm cursor-pointer transition select-none shadow-xs';
+        }
+        if (pickupLabel) {
+          pickupLabel.className = 'flex items-center justify-center gap-2 p-3 sm:p-3.5 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-semibold text-sm cursor-pointer hover:bg-gray-50 transition select-none';
+        }
+        if (deliveryContainer) deliveryContainer.classList.remove('hidden');
+        if (pickupContainer) pickupContainer.classList.add('hidden');
+        clearFieldError('cust-pickup-date-input', 'pickup-date-error');
+        clearFieldError('cust-pickup-time-input', 'pickup-time-error');
+      }
+    }
+
+    function validatePickupDate() {
+      const dateInput = document.getElementById('cust-pickup-date-input');
+      if (!dateInput) return true;
+      const val = dateInput.value;
+      if (!val) {
+        setFieldError('cust-pickup-date-input', 'pickup-date-error', 'Please select a pickup date.');
+        return false;
+      }
+      
+      const parts = val.split('-');
+      if (parts.length !== 3) {
+        setFieldError('cust-pickup-date-input', 'pickup-date-error', 'Please select a valid date.');
+        return false;
+      }
+      const year = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const day = parseInt(parts[2], 10);
+      const selected = new Date(year, month, day);
+
+      const now = new Date();
+      const minDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+      
+      if (selected < minDate) {
+        setFieldError('cust-pickup-date-input', 'pickup-date-error', 'Pickup must be scheduled at least 24 hours in advance.');
+        return false;
+      }
+
+      // Check if selected day is Sunday (0 = Sunday)
+      if (selected.getDay() === 0) {
+        setFieldError('cust-pickup-date-input', 'pickup-date-error', 'Store pickup is unavailable on Sundays (Monday – Saturday only).');
+        return false;
+      }
+      
+      clearFieldError('cust-pickup-date-input', 'pickup-date-error');
+      return true;
+    }
+
+    function validatePickupTime() {
+      const timeInput = document.getElementById('cust-pickup-time-input');
+      if (!timeInput) return true;
+      const val = timeInput.value;
+      if (!val) {
+        setFieldError('cust-pickup-time-input', 'pickup-time-error', 'Please select an hourly pickup window.');
+        return false;
+      }
+      clearFieldError('cust-pickup-time-input', 'pickup-time-error');
+      return true;
+    }
+
     function attachAddressValidationListeners() {
       const phone = document.getElementById('cust-phone-input');
       const bName = document.getElementById('cust-business-name-input');
@@ -1484,12 +1598,22 @@
       const city = document.getElementById('cust-city-input');
       const state = document.getElementById('cust-state-input');
       const zip = document.getElementById('cust-zip-input');
+      const pickupDate = document.getElementById('cust-pickup-date-input');
+      const pickupTime = document.getElementById('cust-pickup-time-input');
 
       if (phone && !phone.dataset.listener) {
         phone.dataset.listener = 'true';
         phone.addEventListener('input', () => {
           if (validatePhone(phone.value)) clearFieldError('cust-phone-input', 'phone-error');
         });
+      }
+      if (pickupDate && !pickupDate.dataset.listener) {
+        pickupDate.dataset.listener = 'true';
+        pickupDate.addEventListener('change', validatePickupDate);
+      }
+      if (pickupTime && !pickupTime.dataset.listener) {
+        pickupTime.dataset.listener = 'true';
+        pickupTime.addEventListener('change', validatePickupTime);
       }
       if (bName && !bName.dataset.listener) {
         bName.dataset.listener = 'true';
@@ -1563,32 +1687,58 @@
       }
 
       const orderId = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
-      const isBusiness = document.getElementById('cust-addr-type-input').value === 'Commercial';
-      const bName = isBusiness ? document.getElementById('cust-business-name-input').value : '';
-      const street = document.getElementById('cust-street-input').value;
-      const city = document.getElementById('cust-city-input').value;
-      const state = document.getElementById('cust-state-input').value;
-      const zip = document.getElementById('cust-zip-input').value;
+      const fulfillmentInput = document.querySelector('input[name="fulfillment_option"]:checked');
+      const fulfillment = fulfillmentInput ? fulfillmentInput.value : 'Delivery';
       const phone = document.getElementById('cust-phone-input').value;
-      const fullAddress = `${street}, ${city}, ${state} ${zip}`;
 
       const subtotal = getCartSubtotal();
       const tax = getCartTax(subtotal);
       const grandTotal = subtotal + tax;
 
-      // Cache customer address locally for future checkouts
-      const savedAddressObj = {
-        name: currentUser.name,
-        email: currentUser.email,
-        phone: phone,
-        addrType: isBusiness ? 'Commercial' : 'Residential',
-        businessName: bName,
-        street: street,
-        city: city,
-        state: state,
-        zip: zip
-      };
-      localStorage.setItem('user_saved_address', JSON.stringify(savedAddressObj));
+      let isBusiness = false;
+      let bName = '';
+      let street = '';
+      let city = '';
+      let state = '';
+      let zip = '';
+      let fullAddress = '';
+      let pickupDate = '';
+      let pickupTime = '';
+      let orderTypeStr = 'Residential Delivery';
+
+      if (fulfillment === 'Pickup') {
+        pickupDate = document.getElementById('cust-pickup-date-input').value;
+        pickupTime = document.getElementById('cust-pickup-time-input').value;
+        orderTypeStr = `Store Pickup (${pickupDate} ${pickupTime})`;
+        street = 'Store Pickup - 123 Market Street, Suite 400';
+        city = 'San Jose';
+        state = 'CA';
+        zip = '95113';
+        fullAddress = `SpiceMart Store, 123 Market Street, Suite 400, San Jose, CA 95113`;
+      } else {
+        isBusiness = document.getElementById('cust-addr-type-input').value === 'Commercial';
+        bName = isBusiness ? document.getElementById('cust-business-name-input').value : '';
+        street = document.getElementById('cust-street-input').value;
+        city = document.getElementById('cust-city-input').value;
+        state = document.getElementById('cust-state-input').value;
+        zip = document.getElementById('cust-zip-input').value;
+        orderTypeStr = isBusiness ? `Commercial Delivery (${bName})` : 'Residential Delivery';
+        fullAddress = `${street}, ${city}, ${state} ${zip}`;
+
+        // Cache customer address locally for future checkouts
+        const savedAddressObj = {
+          name: currentUser.name,
+          email: currentUser.email,
+          phone: phone,
+          addrType: isBusiness ? 'Commercial' : 'Residential',
+          businessName: bName,
+          street: street,
+          city: city,
+          state: state,
+          zip: zip
+        };
+        localStorage.setItem('user_saved_address', JSON.stringify(savedAddressObj));
+      }
 
       const now = new Date();
       const orderPayload = {
@@ -1596,6 +1746,9 @@
         name: currentUser.name,
         email: currentUser.email,
         phone: phone,
+        fulfillmentType: fulfillment,
+        pickupDate: pickupDate,
+        pickupTime: pickupTime,
         date: now.toLocaleDateString(),
         orderTimestamp: now.toLocaleString(),
         address: street,
@@ -1604,7 +1757,7 @@
         state: `${state} ${zip}`,
         stateOnly: state,
         zip: zip,
-        addrType: isBusiness ? 'Commercial' : 'Residential',
+        addrType: isBusiness ? 'Commercial' : (fulfillment === 'Pickup' ? 'Pickup' : 'Residential'),
         businessName: bName,
         orderId: orderId,
         orderedItems: cart.map(it => `${it.name} (x${it.qty}) - $${(Number(it.price) * it.qty).toFixed(2)}`).join(', '),
@@ -1619,7 +1772,7 @@
         total: `$${grandTotal.toFixed(2)}`,
         paymentStatus: 'Pending',
         orderStatus: 'Received',
-        orderType: isBusiness ? `Commercial (${bName})` : 'Residential'
+        orderType: orderTypeStr
       };
 
       // Send to Google Apps Script Orders Webhook
@@ -1644,6 +1797,16 @@
         submitBtn.innerHTML = origBtnHtml;
       }
 
+      const fulfillmentDisplayHtml = fulfillment === 'Pickup' ? `
+        <div><strong>Fulfillment:</strong> <span class="font-bold text-emerald-700">🏪 Store Pickup</span></div>
+        <div><strong>Scheduled Pickup:</strong> ${pickupDate} (${pickupTime})</div>
+        <div><strong>Pickup Location:</strong> 123 Market Street, Suite 400, San Jose, CA 95113</div>
+      ` : `
+        <div><strong>Fulfillment:</strong> <span class="font-bold text-emerald-700">🚚 Home Delivery</span></div>
+        ${isBusiness ? `<div><strong>Business:</strong> ${bName}</div>` : ''}
+        <div><strong>Deliver to:</strong> ${fullAddress}</div>
+      `;
+
       document.getElementById('success-order-details').innerHTML = `
         Thank you, <strong>${currentUser.name}</strong>!<br>
         Your order <strong>#${orderId}</strong> for <strong>$${grandTotal.toFixed(2)}</strong> has been placed.<br><br>
@@ -1653,8 +1816,7 @@
             <span>Invoice PDF generated & emailed to ${currentUser.email}</span>
           </div>
           <div><strong>Recipient:</strong> ${currentUser.email} (${phone})</div>
-          ${isBusiness ? `<div><strong>Business:</strong> ${bName}</div>` : ''}
-          <div><strong>Deliver to:</strong> ${fullAddress}</div>
+          ${fulfillmentDisplayHtml}
           <div class="pt-2 mt-1 border-t border-gray-200 text-[11px] space-y-0.5">
             <div class="flex justify-between text-gray-500"><span>Subtotal:</span><span>$${subtotal.toFixed(2)}</span></div>
             <div class="flex justify-between text-gray-500"><span>Sales Tax (${getTaxRateDisplay()}):</span><span>$${tax.toFixed(2)}</span></div>
@@ -1667,6 +1829,7 @@
       saveCart();
       renderCart();
       document.getElementById('checkout-order-form').reset();
+      handleFulfillmentChange();
       document.getElementById('order-success-modal').classList.remove('hidden');
     }
 
