@@ -256,7 +256,12 @@
 
     // Direct Universal Google OAuth Login Flow (Token Client Popup + GIS Fallback)
     function startGoogleLogin() {
-      // 1. First priority: Google OAuth2 Token Client Popup (No redirect_uri_mismatch!)
+      // 1. Ensure token client is initialized if SDK has loaded
+      if (!tokenClient && window.google && google.accounts) {
+        initGoogleAuth();
+      }
+
+      // 2. Primary & Recommended: Google OAuth2 Token Client Popup (No redirect_uri_mismatch!)
       if (tokenClient) {
         try {
           tokenClient.requestAccessToken({ prompt: 'select_account' });
@@ -266,12 +271,16 @@
         }
       }
 
-      // 2. Secondary fallback: Google Identity Services prompt
+      // 3. Fallback to GIS prompt
       if (window.google && google.accounts && google.accounts.id) {
         try {
           google.accounts.id.prompt((notification) => {
             if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-              launchDirectGoogleOAuth();
+              if (tokenClient) {
+                tokenClient.requestAccessToken({ prompt: 'select_account' });
+              } else {
+                launchDirectGoogleOAuth();
+              }
             }
           });
           return;
@@ -279,6 +288,12 @@
           // Continue to fallback
         }
       }
+
+      if (!window.google || !google.accounts) {
+        alert('Google Sign-In is initializing. Please wait a moment and click Sign In again.');
+        return;
+      }
+
       launchDirectGoogleOAuth();
     }
 
@@ -330,7 +345,7 @@
         }
 
         // Initialize GIS OAuth2 Token Client (Popup flow)
-        if (google.accounts.oauth2) {
+        if (google.accounts.oauth2 && !tokenClient) {
           try {
             tokenClient = google.accounts.oauth2.initTokenClient({
               client_id: GOOGLE_CLIENT_ID,
@@ -347,6 +362,19 @@
         }
       }
     }
+    window.initGoogleAuth = initGoogleAuth;
+
+    // Background polling to ensure Google Auth is ready as soon as SDK loads
+    let gAuthCheckAttempts = 0;
+    function pollGoogleAuthReady() {
+      if (window.google && google.accounts) {
+        initGoogleAuth();
+      } else if (gAuthCheckAttempts < 20) {
+        gAuthCheckAttempts++;
+        setTimeout(pollGoogleAuthReady, 250);
+      }
+    }
+    pollGoogleAuthReady();
 
     // Render Auth UI in Header & Checkout with Guaranteed Touch Targets
     function renderAuthUI() {
