@@ -3,17 +3,19 @@
    ========================================================================== */
 
     // ==========================================
-    // STORE CONFIGURATION KEYS
+    // STORE CONFIGURATION KEYS (Loaded from assets/js/config.js)
     // ==========================================
-    const STORE_NAME = 'SpiceMart'; // <<< Change Store Name in this ONE single place!
-    const STORE_TAGLINE = 'Indian & Mexican Groceries';
-    const GOOGLE_CLIENT_ID = '460683061183-9el98nqfh0djo2qc215lcmb140ini306.apps.googleusercontent.com';
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzneULs0vFdvv1kMutfck8_i03B6lJ8EZdG9_ICIfFsyKNbO4kkSaZKfx9azOtTjKR6/exec'; // Products catalog & search
-    const ORDERS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxshnK3l1cRswHFR65M75Y6wNE_hzMj9dSPoLRdPJVd99M85iKSewA_QTN_4eV-1n4jrA/exec'; // Orders processing, Google Sheet storage, PDF invoice & email dispatch
-    const CUSTOMERS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyjiEWsmjPNMkn6XbMDZ76tsfBQN2L_gwZJjUwUqqEObwPvtoF3tmAlNV7RhTRWMMoIbw/exec'; // CustomerManagement (Profiles & Addresses)
-    const CACHE_KEY = 'spicemart_products_v6';
-    const TAX_RATE = 0.0825; // 8.25% Sales Tax
-    const GOOGLE_MAPS_API_KEY = 'AIzaSyDOq7G_nS3SfFjTHVdI_lrYTK1Jofzf4nE'; // Optional Google Maps Platform API Key (Places & Geocoding)
+    const _cfg = (typeof window !== 'undefined' && (window.CONFIG || window.APP_CONFIG)) || {};
+
+    const STORE_NAME = _cfg.STORE_NAME || 'SpiceMart'; // <<< Change Store Name in assets/js/config.js
+    const STORE_TAGLINE = _cfg.STORE_TAGLINE || 'Indian & Mexican Groceries';
+    const GOOGLE_CLIENT_ID = _cfg.GOOGLE_CLIENT_ID || '460683061183-9el98nqfh0djo2qc215lcmb140ini306.apps.googleusercontent.com';
+    const SCRIPT_URL = _cfg.SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbzneULs0vFdvv1kMutfck8_i03B6lJ8EZdG9_ICIfFsyKNbO4kkSaZKfx9azOtTjKR6/exec'; // Products catalog & search
+    const ORDERS_SCRIPT_URL = _cfg.ORDERS_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbxshnK3l1cRswHFR65M75Y6wNE_hzMj9dSPoLRdPJVd99M85iKSewA_QTN_4eV-1n4jrA/exec'; // Orders processing, Google Sheet storage, PDF invoice & email dispatch
+    const CUSTOMERS_SCRIPT_URL = _cfg.CUSTOMERS_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbyjiEWsmjPNMkn6XbMDZ76tsfBQN2L_gwZJjUwUqqEObwPvtoF3tmAlNV7RhTRWMMoIbw/exec'; // CustomerManagement (Profiles & Addresses)
+    const CACHE_KEY = _cfg.CACHE_KEY || 'spicemart_products_v6';
+    const TAX_RATE = (typeof _cfg.TAX_RATE === 'number') ? _cfg.TAX_RATE : 0.0825; // 8.25% Sales Tax
+    const GOOGLE_MAPS_API_KEY = _cfg.GOOGLE_MAPS_API_KEY || 'AIzaSyDOq7G_nS3SfFjTHVdI_lrYTK1Jofzf4nE'; // Optional Google Maps Platform API Key (Places & Geocoding)
 
     // Default Fallback Products Inventory
     const DEFAULT_PRODUCTS = [
