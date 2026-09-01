@@ -13,7 +13,7 @@
     const CUSTOMERS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyjiEWsmjPNMkn6XbMDZ76tsfBQN2L_gwZJjUwUqqEObwPvtoF3tmAlNV7RhTRWMMoIbw/exec'; // CustomerManagement (Profiles & Addresses)
     const CACHE_KEY = 'spicemart_products_v6';
     const TAX_RATE = 0.0825; // 8.25% Sales Tax
-    const GOOGLE_MAPS_API_KEY = 'AIzaSyDOq7G_nS3SfFjTHVdI_lrYTK1Jofzf4nE'; // Optional Google Maps Platform API Key (Places & Geocoding)
+    const GOOGLE_MAPS_API_KEY = ''; // Optional Google Maps Platform API Key (Places & Geocoding) - get this from screte manager
 
     // Default Fallback Products Inventory
     const DEFAULT_PRODUCTS = [
